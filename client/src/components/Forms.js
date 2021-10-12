@@ -10,7 +10,7 @@ export default class Forms extends Component {
                     <AddListing addListing={this.props.addListing}/>
                 </div>
                 <div>
-                    <AddAuction />
+                    <AddAuction addAuction={this.props.addAuction}/>
                 </div>
             </div>
         )

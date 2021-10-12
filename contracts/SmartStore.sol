@@ -174,7 +174,24 @@ contract SmartStore {
             PendingItem memory pendingItem = PendingItem(currentAuction.auctionID, currentAuction.itemName, currentAuction.itemDescription, amount, publicKeyOfWinner);
             pendingDeliveries[currentAuction.sellerId].push(pendingItem);
         }
-    } 
+    }
+
+    function getNumberOfAuctions() public returns (uint) {
+        return auctions.length;
+    }
+
+    function getParticularAuction(uint idx) public view returns (Auction memory) {
+        return auctions[idx];
+    }
+
+    function getStatusOfAuction(uint auctionID, uint idx) public view returns (bool) {
+        if(auctionStatus[auctionID] == AuctionState.RUNNING && now < auctions[idx].startTime + auctions[idx].biddingTime) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function getHash(uint value, bytes32 secret) public view returns (bytes32) {
         bytes32 hash = keccak256(abi.encodePacked(value, secret));
         return hash;

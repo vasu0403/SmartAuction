@@ -37,6 +37,14 @@ export default class AddAuction extends Component {
     }
     submit() {
         console.log(this.state);
+        this.props.addAuction(this.state);
+        this.setState({
+            itemName: "",
+            itemDescription: "",
+            biddingTime: "",
+            revealTime: "",
+            method: ""
+        })
     }
     render() {
         const onFinish = (values: any) => {
