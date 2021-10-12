@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Reveal from './components/Reveal';
+import Keys from './components/Keys';
 
 class App extends Component {
 	state = { storageValue: 0, web3: null, accounts: null, contract: null };
@@ -219,6 +220,9 @@ class App extends Component {
 						</Route>
 						<Route path='/forms'>
 							<Forms addListing={this.addListing} addAuction={this.addAuction}/>
+						</Route>
+						<Route path='/keys'>
+							<Keys />
 						</Route>
 					</Switch>
 				</div>
