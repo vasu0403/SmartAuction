@@ -5,83 +5,120 @@ import getWeb3 from "./getWeb3";
 import Forms from './components/Forms'
 import Products from './components/Products'
 import "./App.css";
+import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom';
+import Home from './components/Home';
+import Profile from './components/Profile';
 
 class App extends Component {
   state = { storageValue: 0, web3: null, accounts: null, contract: null };
   componentDidMount = async () => {
-    try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
+	try {
+	  // Get network provider and web3 instance.
+	  const web3 = await getWeb3();
 
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
+	  // Use web3 to get the user's accounts.
+	  const accounts = await web3.eth.getAccounts();
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SmartStore.networks[networkId];
-      const instance = new web3.eth.Contract(
-        SmartStore.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
+	  // Get the contract instance.
+	  const networkId = await web3.eth.net.getId();
+	  const deployedNetwork = SmartStore.networks[networkId];
+	  const instance = new web3.eth.Contract(
+		SmartStore.abi,
+		deployedNetwork && deployedNetwork.address,
+	  );
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance });
-      this.getListings();
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-    }
+	  // Set web3, accounts, and contract to the state, and then proceed with an
+	  // example of interacting with the contract's methods.
+	  this.setState({ web3, accounts, contract: instance });
+	  this.getListings();
+	} catch (error) {
+	  // Catch any errors for any of the above operations.
+	  alert(
+		`Failed to load web3, accounts, or contract. Check console for details.`,
+	  );
+	  console.error(error);
+	}
   };
 
   addListing = async (formValues) => {
-    const { accounts, contract } = this.state;
-    console.log('in App.js', formValues);
-    console.log(accounts)
-    // // Stores a given value, 5 by default.
-    await contract.methods.addListing(formValues.itemName, formValues.itemDescription, formValues.askingPrice).send({ from:  accounts[0] });
+	const { accounts, contract } = this.state;
+	console.log('in App.js', formValues);
+	console.log(accounts)
+	// // Stores a given value, 5 by default.
+	await contract.methods.addListing(formValues.itemName, formValues.itemDescription, formValues.askingPrice).send({ from:  accounts[0] });
 
-    // // Get the value from the contract to prove it worked.
+	// // Get the value from the contract to prove it worked.
 
-    // // Update state with the result.
-    // this.setState({ storageValue: response });
+	// // Update state with the result.
+	// this.setState({ storageValue: response });
   };
 
+  buyListing = async (itemId, key, price) => {
+	const {accounts, contract} = this.state;
+	console.log(accounts);
+	await contract.methods.buyListing(itemId, key).send({from: accounts[0], value: price});
+  }
+
   getListings = async() => {
-    const {accounts, contract} = this.state;
-    console.log("getting listings");
-    let numberOfListings = await contract.methods.getNumberOfListings().call();
-    const listings = [];
-    for(let i = 0; i < numberOfListings; i++) {
-      const data = await contract.methods.getParticularListing(i).call();
-      const status = await contract.methods.getStatusOfListing(data.listingID);
-      if(status) {
-        listings.push({
-          askingPrice: data.askingPrice,
-          itemDescription: data.itemDescription,
-          itemName: data.itemName,
-          listingID: data.listingID,
-          sellerID: data.sellerID,
-        });
-      }
-    }
-    console.log(listings);
+	const {accounts, contract} = this.state;
+	console.log("getting listings");
+	let numberOfListings = await contract.methods.getNumberOfListings().call();
+	var listings = [];
+	for(let i = 0; i < numberOfListings; i++) {
+	  const data = await contract.methods.getParticularListing(i).call();
+	  const status = await contract.methods.getStatusOfListing(data.listingID);
+	  if(status) {
+		listings.push({
+		  askingPrice: data.askingPrice,
+		  itemDescription: data.itemDescription,
+		  itemName: data.itemName,
+		  listingID: data.listingID,
+		  sellerID: data.sellerID,
+		});
+	  }
+	}
+	// console.log(listings);
+	return listings;
+  }
+
+  getPendingDeliveries = async() => {
+	const {accounts, contract} = this.state;
+	console.log("getting pending deliveries");
+	let numberOfPendingDeliveries = await contract.methods.getNumberOfPendingTransactions().call({from: accounts[0]});
+	var pendingDeliveries = [];
+	for(let i = 0;i < numberOfPendingDeliveries; i++){
+		const data = await contract.methods.getParticularPendingListing(i).call();
+		pendingDeliveries.push(data);
+	}
+	return pendingDeliveries;
   }
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
-    return (
-      <div className="App">
-        <div>
-          <Forms addListing={this.addListing}/>
-        </div>
-      </div>
-    );
+	if (!this.state.web3) {
+	  return <div>Loading Web3, accounts, and contract...</div>;
+	}
+	return (
+		<Router>
+			<div>
+				<Switch>
+					<Route exact path='/'>
+						<Home getListings={this.getListings} buyListing={this.buyListing}/>
+					</Route>
+					<Route path='/profile'>
+						<Profile getPendingDeliveries={this.getPendingDeliveries}/>
+					</Route>
+					<Route path='/forms'>
+						<Forms addListing={this.addListing}/>
+					</Route>
+				</Switch>
+			</div>
+		</Router>
+		// <div className="App">
+		//     <div>
+		//         <Forms addListing={this.addListing}/>
+		//     </div>
+		// </div>
+	);
   }
 }
 

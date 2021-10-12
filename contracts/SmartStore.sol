@@ -209,6 +209,14 @@ contract SmartStore {
         return pendingDeliveries[msg.sender];
     }
 
+    function getNumberOfPendingTransactions() public returns (uint) {
+        return pendingDeliveries[msg.sender].length;
+    }
+
+    function getParticularPendingListing(uint idx) public view returns (PendingItem memory) {
+        return pendingDeliveries[msg.sender][idx];
+    }
+
     /**
      * @notice function to deliver an item. The seller must send the itemText by correctly encrypting it with the public key assosciated with that product
      * @param itemID ID of the product which needs to be delivered
