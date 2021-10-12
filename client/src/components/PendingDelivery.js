@@ -27,6 +27,7 @@ class Listing extends Component{
 		this.state = {
 			ordering: false,
 			publicKey: "",
+			itemText: "",
 		}
 	}
 	enterPublicKey(){
@@ -36,9 +37,9 @@ class Listing extends Component{
 		console.log(itemId, publicKey, price);
 		this.props.buyListing(itemId, publicKey, price);
 	}
-	changePublicKey(newValue) {
+	changeItemText(newValue) {
 		this.setState({
-			publicKey: newValue,
+			itemText: newValue,
 		})
 	}
 	render(){
@@ -50,19 +51,18 @@ class Listing extends Component{
 					<div>{this.props.price} WEI</div>
 				</div>
 				<div style={{border: "solid 1px black"}}>{this.props.desc}</div>
-				<div style={{marginTop: '2%'}}>
-					<TextField 
+				<div style={{border: "solid 1px black", marginTop: '2%'}}>{this.props.publicKey}</div>
+				<TextField 
 						id="outlined-basic" 
-						label="Enter you public key here" 
+						label="Enter item string here" 
 						variant="outlined" 
-						value={this.state.publicKey}
-						onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
-					/>
-				</div>
+						value={this.state.itemText}
+						onChange={(newValue) => {this.changeItemText(newValue.target.value)}}
+				/>
 				<div className='listing-footer'>
 					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
 					{/* {this.state.ordering ? */}
-					<Button color="primary" onClick={() => this.submit(this.props.listingId, this.state.publicKey, this.props.price)}><b>Buy</b></Button>
+					<Button color="primary" onClick={() => this.props.deliverListing(this.props.listingId, this.state.itemText)}><b>Deliver</b></Button>
 				</div>
 			</Card>
 		)

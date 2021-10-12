@@ -59,6 +59,11 @@ class App extends Component {
 	await contract.methods.buyListing(itemId, key).send({from: accounts[0], value: price});
   }
 
+  deliverListing = async (itemId, text) => {
+	const {accounts, contract} = this.state;
+	await contract.methods.delieverItem(itemId, text).send({from: accounts[0]});
+  }
+
   getListings = async() => {
 	const {accounts, contract} = this.state;
 	console.log("getting listings");
@@ -66,7 +71,7 @@ class App extends Component {
 	var listings = [];
 	for(let i = 0; i < numberOfListings; i++) {
 	  const data = await contract.methods.getParticularListing(i).call();
-	  const status = await contract.methods.getStatusOfListing(data.listingID);
+	  const status = await contract.methods.getStatusOfListing(data.listingID).call();
 	  if(status) {
 		listings.push({
 		  askingPrice: data.askingPrice,
@@ -86,9 +91,16 @@ class App extends Component {
 	console.log("getting pending deliveries");
 	let numberOfPendingDeliveries = await contract.methods.getNumberOfPendingTransactions().call({from: accounts[0]});
 	var pendingDeliveries = [];
+	console.log(numberOfPendingDeliveries)
 	for(let i = 0;i < numberOfPendingDeliveries; i++){
-		const data = await contract.methods.getParticularPendingListing(i).call();
-		pendingDeliveries.push(data);
+		const data = await contract.methods.getParticularPendingListing(i).call({from: accounts[0]});
+		pendingDeliveries.push({
+			askingPrice: data.askingPrice,
+			itemDescription: data.itemDescription,
+			listingID: data.listingID,
+			publicKey: data.publicKey,
+			itemName: data.itemName,
+		});
 	}
 	return pendingDeliveries;
   }
@@ -105,7 +117,7 @@ class App extends Component {
 						<Home getListings={this.getListings} buyListing={this.buyListing}/>
 					</Route>
 					<Route path='/profile'>
-						<Profile getPendingDeliveries={this.getPendingDeliveries}/>
+						<Profile getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing}/>
 					</Route>
 					<Route path='/forms'>
 						<Forms addListing={this.addListing}/>

@@ -12,6 +12,7 @@ import Listings from './Listings';
 import Auctions from './Auctions';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
+import PendingDeliveries from './PendingDeliveries';
 
 const styles = theme => ({
 	root: {
@@ -53,22 +54,23 @@ class Profile extends Component{
 					</Toolbar>
 				</AppBar>
 				<Tabs
-				value={this.tabValue}
-				indicatorColor="primary"
-				textColor="secondary"
-				onChange={this.changeTab}
-				aria-label="tabs example"
-				centered
-				variant="fullWidth"
+					value={this.tabValue}
+					indicatorColor="primary"
+					textColor="secondary"
+					onChange={this.changeTab}
+					aria-label="tabs example"
+					centered
+					variant="fullWidth"
 				>
 				<Tab value="0" label="Your Orders" />
 				<Tab value="1" label="Pending Deliveries" />
 				</Tabs>
-				{/* <Box display="flex" alignItems="center" justifyContent="center">
-					{this.state.tabValue === "0" ?
-					<Listings getListings={this.props.getListings} buyListing={this.props.buyListing}/> :
-					<Auctions />}
-				</Box> */}
+				{
+					this.state.tabValue === "0" ?
+						<div> hello </div> :
+						<PendingDeliveries getPendingDeliveries = {this.props.getPendingDeliveries} deliverListing = {this.props.deliverListing}/>
+				}
+
 			</div>
 		)
 	}
