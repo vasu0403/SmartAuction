@@ -62,6 +62,7 @@ contract SmartStore {
     /// @dev list of all products. Also includes products which have already been sold
     Listing[] private listings;
     Auction[] private auctions;
+    mapping(uint => address payable[]) bidders;
 
     uint listingCounter = 0;
 
@@ -137,6 +138,7 @@ contract SmartStore {
     }
     function revealBid(uint auctionID, uint value, bytes32 secret) public payable{
         require(auctionStatus[auctionID] == AuctionState.REVEAL_TIME, "Reveal time is either over, or has not started yet");
+        bidders[auctionID].push(msg.sender);
         uint refundAmount = auctionContracts[auctionID].reveal(value, secret, msg.sender);
         address payable bidderAddress = msg.sender;
         bidderAddress.transfer(refundAmount);
@@ -192,6 +194,10 @@ contract SmartStore {
             }
             PendingItem memory pendingItem = PendingItem(currentAuction.auctionID, currentAuction.itemName, currentAuction.itemDescription, amount, publicKeyOfWinner);
             pendingDeliveries[currentAuction.sellerId].push(pendingItem);
+            for(uint i = 0; i < bidders[auctionID].length; i++) {
+                address payable curBidder = bidders[auctionID][i];
+                getPendingMoney(auctionID, curBidder);    
+            }
         }
     }
 
@@ -335,9 +341,8 @@ contract SmartStore {
     function getParticularOrderItem(uint idx) public view returns (BoughtItem memory) {
         return myItems[msg.sender][idx];
     } 
-    function getPendingMoney(uint auctionID) public {
-        uint amount = auctionContracts[auctionID].pendingMoney(msg.sender);
-        address payable bidderAddress = msg.sender;
-        bidderAddress.transfer(amount);
+    function getPendingMoney(uint auctionID, address payable bidder) public {
+        uint amount = auctionContracts[auctionID].pendingMoney(bidder);
+        bidder.transfer(amount);
     }   
 }
