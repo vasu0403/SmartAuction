@@ -51,7 +51,7 @@ class Auction extends Component{
 		})
 	}
 
-    async submit(bidValue, secret){
+    async placeBid(bidValue, secret){
         // await this.props.getBidHash(bidValue, secret).then(result => this.setState({
 		// 	hash: result
 		// }));
@@ -59,6 +59,10 @@ class Auction extends Component{
 		console.log("hell owold")
         this.props.placeBid(this.props.data.auctionID, "0xdd044e774ba476726a39ca417f8ccc829d3c1b0c9f9c85b027f9123d2d701d49", "public key 1");
     }
+
+	async revealBid(bidValue, secret){
+		this.props.revealBid(this.props.data.auctionID, bidValue, secret);
+	}
 
 	render(){
 		const classes = this.props
@@ -73,10 +77,10 @@ class Auction extends Component{
 				<div className='auctionTextFields'>
 					<TextField 
 						label="Bid Price" 
-						variant="standard" 
+						variant={this.props.type === "reveal" ? "standard" : "outlined"}
 						value={this.state.bid}
                         className="textField"
-                        type="number"
+                        type={this.props.type === "reveal" ? "number" : ""}
 						onChange={(newValue) => {this.changeBid(newValue.target.value)}}
                         />
                     <TextField 
@@ -91,7 +95,9 @@ class Auction extends Component{
 				<div className='listing-footer'>
 					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
 					{/* {this.state.ordering ? */}
-					<Button color="primary" onClick={() => this.submit(this.state.bid, this.state.publicKey)}><b>Place Bid</b></Button>
+					{this.props.type === "bidding" ?
+					<Button color="primary" onClick={() => this.submit(this.state.bid, this.state.publicKey)}><b>Place Bid</b></Button> :
+					<Button color="primary" onClick={() => this.submit(this.state.bid, this.state.publicKey)}><b>Reveal Bid</b></Button> }
 				</div>
 			</Card>
 		)

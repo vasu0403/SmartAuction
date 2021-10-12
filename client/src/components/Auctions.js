@@ -23,7 +23,7 @@ class Auctions extends Component{
 
     render(){
         console.log("auctions", this.state.auctions);
-        let auctionGrid = this.state.auctions.map(auction => <Auction data={auction} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid}/>)
+        let auctionGrid = this.state.auctions.map(auction => <Auction type={this.props.type === "reveal" ? "reveal" : "bidding"} data={auction} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>)
         return(
             <Box margin="10px" display="flex" flexDirection="row" flexWrap="wrap" justifyContent="space-around" alignItems="center" width="90%">
                 {auctionGrid}

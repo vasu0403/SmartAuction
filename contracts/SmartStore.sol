@@ -2,8 +2,8 @@
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
-import './SecondPriceAuction.sol';
-import './AveragePriceAuction.sol';
+// import './SecondPriceAuction.sol';
+// import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -117,11 +117,12 @@ contract SmartStore {
     function factory(uint biddingTime, uint revealTime, address creator, string memory method) public returns(BaseAuction){
         if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
             return new FirstPriceAuction(biddingTime, revealTime, creator);
-        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-            return new SecondPriceAuction(biddingTime, revealTime, creator); 
-        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-            return new AveragePriceAuction(biddingTime, revealTime, creator); 
         }
+        // } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
+        //     return new SecondPriceAuction(biddingTime, revealTime, creator); 
+        // } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
+        //     return new AveragePriceAuction(biddingTime, revealTime, creator); 
+        // }
     }
     function addAuction(string memory itemName, string memory itemDescription, uint biddingTime, uint revealTime, string memory method) public {
         Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, now, biddingTime, revealTime, method);
@@ -190,8 +191,16 @@ contract SmartStore {
         return auctions[idx];
     }
 
-    function getStatusOfAuction(uint auctionID, uint idx) public view returns (bool) {
-        if(auctionStatus[auctionID] == AuctionState.RUNNING && now < auctions[idx].startTime + auctions[idx].biddingTime) {
+    function getStatusOfAuction(uint auctionID) public view returns (bool) {
+        if(auctionStatus[auctionID] == AuctionState.RUNNING) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    function getAuctionBiddingTimeEnded(uint idx) public view returns (bool) {
+        if(block.timestamp > auctions[idx].startTime + auctions[idx].biddingTime){
             return true;
         } else {
             return false;

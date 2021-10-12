@@ -7,7 +7,7 @@ module.exports = {
   networks: {
     develop: {
       port: 8545,
-      gas: 1000000000000000
+      gas: 100000000000000000000000000
     }
   },
   solc: {

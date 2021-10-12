@@ -11,6 +11,7 @@ import Tab from '@material-ui/core/Tab';
 import Listings from './Listings';
 import Auctions from './Auctions';
 import Box from '@material-ui/core/Box';
+import "../App.css";
 
 const styles = theme => ({
 	root: {
@@ -46,9 +47,14 @@ class Home extends Component{
 							<Typography variant="h6" className={classes.title}>
 								App Name
 							</Typography>
-							<Link href="/profile" style={{"text-decoration": "none"}}>
-								<Button color="default" variant="contained">Your Profile</Button>
-							</Link>
+							<div className="navbar">
+								<Link href="/reveal" style={{"text-decoration": "none"}}>
+									<Button color="default" variant="contained">Reveal Your Bid</Button>
+								</Link>
+								<Link href="/profile" style={{"text-decoration": "none"}}>
+									<Button color="default" variant="contained">Your Profile</Button>
+								</Link>
+							</div>
 						</Box>
 					</Toolbar>
 				</AppBar>
@@ -67,7 +73,7 @@ class Home extends Component{
 				<Box display="flex" alignItems="center" justifyContent="center">
 					{this.state.tabValue === "0" ?
 					<Listings getListings={this.props.getListings} buyListing={this.props.buyListing}/> :
-					<Auctions getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid}/>}
+					<Auctions getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>}
 				</Box>
 			</div>
 		)

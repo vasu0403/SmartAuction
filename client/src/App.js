@@ -8,6 +8,7 @@ import "./App.css";
 import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom';
 import Home from './components/Home';
 import Profile from './components/Profile';
+import Reveal from './components/Reveal';
 
 class App extends Component {
 	state = { storageValue: 0, web3: null, accounts: null, contract: null };
@@ -99,9 +100,39 @@ class App extends Component {
 		var auctions = [];
 		for(let i = 0; i < numberOfAuctions; i++){
 			const data = await contract.methods.getParticularAuction(i).call();
+			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID).call();
+			const biddingTimeEnded = await contract.methods.getAuctionBiddingTimeEnded(i).call();
+			console.log(auctionStatus, biddingTimeEnded);
+			if(auctionStatus && !biddingTimeEnded){
+				auctions.push({
+					itemName: data.itemName,
+					itemDescription: data.itemDescription,
+					sellerID: data.sellerID,
+					auctionID: data.auctionID,
+					method: data.method,
+					biddingTime: data.biddingTime,
+					startTime: data.startTime,
+					revealTime: data.revealTime
+				});
+			}
+		}
+		console.log("auctions", auctions)
+		return auctions;
+	}
+
+	getRevealAuctions = async() => {
+		const {accounts, contract} = this.state;
+		console.log("getting auctions to reveal your bid");
+		let numberOfAuctions = await contract.methods.getNumberOfAuctions().call();
+		console.log(numberOfAuctions);
+		var auctions = [];
+		for(let i = 0; i < numberOfAuctions; i++){
+			const data = await contract.methods.getParticularAuction(i).call();
 			console.log(data);
-			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID, i).call();
-			if(auctionStatus){
+			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID).call();
+			const biddingTimeEnded = await contract.methods.getAuctionBiddingTimeEnded(i).call();
+			console.log(auctionStatus, biddingTimeEnded);
+			if(auctionStatus && biddingTimeEnded){
 				auctions.push({
 					itemName: data.itemName,
 					itemDescription: data.itemDescription,
@@ -127,7 +158,12 @@ class App extends Component {
 
 	placeBid = async(auctionId, _blindedBid, publicKey) => {
 		const {accounts, contract} = this.state;
-		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).call({from: accounts[0]});
+		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).send({from: accounts[0]});
+	}
+
+	revealBid = async(auctionId, bidValue, publicKey) => {
+		const {accounts, contract} = this.state;
+		await contract.methods.revealBid(auctionId, bidValue, publicKey).send({from: accounts[0], value: bidValue});
 	}
 
 	getPendingDeliveries = async() => {
@@ -177,7 +213,10 @@ class App extends Component {
 				<div>
 					<Switch>
 						<Route exact path='/'>
-							<Home getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid}/>
+							<Home getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
+						</Route>
+						<Route path='/reveal'>
+							<Reveal getAuctions={this.getRevealAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/profile'>
 							<Profile getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
