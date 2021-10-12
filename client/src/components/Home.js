@@ -73,7 +73,7 @@ class Home extends Component{
 				<Box display="flex" alignItems="center" justifyContent="center">
 					{this.state.tabValue === "0" ?
 					<Listings getListings={this.props.getListings} buyListing={this.props.buyListing}/> :
-					<Auctions getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>}
+					<Auctions auctionStatus={1} getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>}
 				</Box>
 			</div>
 		)

@@ -59,7 +59,7 @@ class Reveal extends Component{
 					</Toolbar>
 				</AppBar>
 				<Box display="flex" alignItems="center" justifyContent="center">
-					<Auctions type="reveal" getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>
+					<Auctions auctionStatus={2} type="reveal" getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>
 				</Box>
 			</div>
         )

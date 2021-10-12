@@ -56,7 +56,7 @@ class App extends Component {
 	addAuction = async (formValues) => {
 		const {accounts, contract} = this.state;
 
-		await contract.methods.addAuction(formValues.itemName, formValues.itemDescription, formValues.biddingTime, formValues.revealTime, formValues.method).send({from: accounts[0]});
+		await contract.methods.addAuction(formValues.itemName, formValues.itemDescription, formValues.method).send({from: accounts[0]});
 	}
 
 	buyListing = async (itemId, key, price) => {
@@ -91,7 +91,7 @@ class App extends Component {
 		return listings;
 	}
 
-	getAuctions = async() => {
+	getAuctions = async(status) => {
 		const {accounts, contract} = this.state;
 		console.log("getting auctions");
 		let numberOfAuctions = await contract.methods.getNumberOfAuctions().call();
@@ -100,18 +100,13 @@ class App extends Component {
 		for(let i = 0; i < numberOfAuctions; i++){
 			const data = await contract.methods.getParticularAuction(i).call();
 			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID).call();
-			const biddingTimeEnded = await contract.methods.getAuctionBiddingTimeEnded(i).call();
-			console.log(auctionStatus, biddingTimeEnded);
-			if(auctionStatus && !biddingTimeEnded){
+			if(auctionStatus == status){
 				auctions.push({
 					itemName: data.itemName,
 					itemDescription: data.itemDescription,
 					sellerID: data.sellerID,
 					auctionID: data.auctionID,
 					method: data.method,
-					biddingTime: data.biddingTime,
-					startTime: data.startTime,
-					revealTime: data.revealTime
 				});
 			}
 		}
@@ -119,33 +114,35 @@ class App extends Component {
 		return auctions;
 	}
 
-	getRevealAuctions = async() => {
+	getOwnerAuctions = async() => {
 		const {accounts, contract} = this.state;
-		console.log("getting auctions to reveal your bid");
-		let numberOfAuctions = await contract.methods.getNumberOfAuctions().call();
+		console.log("getting your auctions");
+		let numberOfAuctions = await contract.methods.getNumberOfOwnerAuctions().call({from: accounts[0]});
 		console.log(numberOfAuctions);
 		var auctions = [];
 		for(let i = 0; i < numberOfAuctions; i++){
-			const data = await contract.methods.getParticularAuction(i).call();
-			console.log(data);
+			const data = await contract.methods.getOwnerAuction(i).call({from: accounts[0]});
 			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID).call();
-			const biddingTimeEnded = await contract.methods.getAuctionBiddingTimeEnded(i).call();
-			console.log(auctionStatus, biddingTimeEnded);
-			if(auctionStatus && biddingTimeEnded){
-				auctions.push({
-					itemName: data.itemName,
-					itemDescription: data.itemDescription,
-					sellerID: data.sellerID,
-					auctionID: data.auctionID,
-					method: data.method,
-					biddingTime: data.biddingTime,
-					startTime: data.startTime,
-					revealTime: data.revealTime
-				});
-			}
+			auctions.push({
+				itemName: data.itemName,
+				itemDescription: data.itemDescription,
+				sellerID: data.sellerID,
+				auctionID: data.auctionID,
+				method: data.method,
+				status: auctionStatus
+			})
 		}
-		console.log(auctions)
 		return auctions;
+	}
+
+	endBiddingTime = async(auctionId) => {
+		const {accounts, contract} = this.state;
+		await contract.methods.endBiddingTime(auctionId).send({from: accounts[0]});
+	}
+
+	endAuction = async(auctionId) => {
+		const {accounts, contract} = this.state;
+		await contract.methods.endAuction(auctionId).send({from: accounts[0]});
 	}
 
 	getBidHash = async(bidValue, secret) => {
@@ -215,10 +212,10 @@ class App extends Component {
 							<Home getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/reveal'>
-							<Reveal getAuctions={this.getRevealAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
+							<Reveal getAuctions={this.getAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/profile'>
-							<Profile getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
+							<Profile endBiddingTime={this.endBiddingTime} endAuction={this.endAuction} getAuctions={this.getOwnerAuctions} getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
 						</Route>
 						<Route path='/forms'>
 							<Forms addListing={this.addListing} addAuction={this.addAuction}/>

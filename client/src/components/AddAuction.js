@@ -86,26 +86,6 @@ export default class AddAuction extends Component {
                     </Form.Item>
 
                     <Form.Item
-                        label="Bidding Time"
-                        name="biddingTime"
-                    >
-                        <InputNumber
-                            value={this.state.biddingTime}
-                            onChange={(newBiddingTime) => this.setBiddingTime(newBiddingTime)}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Reveal Time"
-                        name="revealTime"
-                    >
-                        <InputNumber
-                            value={this.state.revealTime}
-                            onChange={(newRevealTime) => this.setRevealTime(newRevealTime)}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
                         label="Method"
                         name="method"
                     >

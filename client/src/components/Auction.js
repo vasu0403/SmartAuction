@@ -74,30 +74,33 @@ class Auction extends Component{
 					{/* <div>{this.props.data.askingPrice} WEI</div> */}
 				</div>
 				<div style={{border: "solid 1px black"}}>{this.props.data.itemDescription}</div>
-				<div className='auctionTextFields'>
-					<TextField 
-						label="Bid Price" 
-						variant={this.props.type === "reveal" ? "standard" : "outlined"}
-						value={this.state.bid}
-                        className="textField"
-                        type={this.props.type === "reveal" ? "number" : ""}
-						onChange={(newValue) => {this.changeBid(newValue.target.value)}}
-                        />
-                    <TextField 
-						label="Public Key" 
-						variant="outlined" 
-						value={this.state.publicKey}
-                        className="textField"
-                        style={{width: "50%"}}
-						onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
-					/>
-				</div>
+				{this.props.type != "owner" ?
+					<div className='auctionTextFields'>
+						<TextField 
+							label="Bid Price" 
+							variant={this.props.type === "reveal" ? "standard" : "outlined"}
+							value={this.state.bid}
+							className="textField"
+							type={this.props.type === "reveal" ? "number" : ""}
+							onChange={(newValue) => {this.changeBid(newValue.target.value)}}
+							/>
+						<TextField 
+							label="Public Key" 
+							variant="outlined" 
+							value={this.state.publicKey}
+							className="textField"
+							style={{width: "50%"}}
+							onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
+						/>
+					</div> :
+					<div></div>
+				}
 				<div className='listing-footer'>
 					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
 					{/* {this.state.ordering ? */}
 					{this.props.type === "bidding" ?
-					<Button color="primary" onClick={() => this.submit(this.state.bid, this.state.publicKey)}><b>Place Bid</b></Button> :
-					<Button color="primary" onClick={() => this.submit(this.state.bid, this.state.publicKey)}><b>Reveal Bid</b></Button> }
+					<Button color="primary" onClick={() => this.placeBid(this.state.bid, this.state.publicKey)}><b>Place Bid</b></Button> :
+					<Button color="primary" onClick={() => this.revealBid(this.state.bid, this.state.publicKey)}><b>Reveal Bid</b></Button> }
 				</div>
 			</Card>
 		)

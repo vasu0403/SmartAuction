@@ -14,6 +14,7 @@ import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import PendingDeliveries from './PendingDeliveries';
 import BoughtItems from './BoughtItems';
+import OwnerAuctions from './OwnerAuctions';
 
 const styles = theme => ({
 	root: {
@@ -64,12 +65,16 @@ class Profile extends Component{
 					variant="fullWidth"
 				>
 				<Tab value="0" label="Your Orders" />
-				<Tab value="1" label="Pending Deliveries" />
+				<Tab value="1" label="Your Auctions" />
+				<Tab value="2" label="Pending Deliveries" />
 				</Tabs>
 				{
 					this.state.tabValue === "0" ?
-						<BoughtItems getOrders={this.props.getOrders}/> :
+						<BoughtItems getOrders={this.props.getOrders} /> :
+						this.state.tabValue === "1" ?
+						<OwnerAuctions endBiddingTime={this.props.endBiddingTime} endAuction={this.props.endAuction} getAuctions={this.props.getAuctions}/> :
 						<PendingDeliveries getPendingDeliveries = {this.props.getPendingDeliveries} deliverListing = {this.props.deliverListing}/>
+					
 				}
 
 			</div>

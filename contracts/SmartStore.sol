@@ -2,8 +2,8 @@
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
-// import './SecondPriceAuction.sol';
-// import './AveragePriceAuction.sol';
+import './SecondPriceAuction.sol';
+import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -113,17 +113,14 @@ contract SmartStore {
         }
     }
     function factory(address creator, string memory method) public returns(BaseAuction){
-        if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
-            return new FirstPriceAuction(creator);
-        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-            // return new SecondPriceAuction(creator); 
-        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-            // return new AveragePriceAuction(creator); 
-        }
-        // } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-        //     return new SecondPriceAuction(biddingTime, revealTime, creator); 
-        // } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-        //     return new AveragePriceAuction(biddingTime, revealTime, creator); 
+        // if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
+        //     return new FirstPriceAuction(creator);
+        // } else 
+        if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
+            return new SecondPriceAuction(creator); 
+        } 
+        // else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
+        //     return new AveragePriceAuction(creator); 
         // }
     }
     function addAuction(string memory itemName, string memory itemDescription, string memory method) public {
@@ -208,20 +205,22 @@ contract SmartStore {
         return auctions[idx];
     }
 
-    function getStatusOfAuction(uint auctionID) public view returns (bool) {
+    function getStatusOfAuction(uint auctionID) public view returns (uint) {
         if(auctionStatus[auctionID] == AuctionState.RUNNING) {
-            return true;
+            return 1;
+        } else if(auctionStatus[auctionID] == AuctionState.REVEAL_TIME) {
+            return 2;
         } else {
-            return false;
+            return 0;
         }
     }
-    
-    function getAuctionBiddingTimeEnded(uint idx) public view returns (bool) {
-        if(block.timestamp > auctions[idx].startTime + auctions[idx].biddingTime){
-            return true;
-        } else {
-            return false;
-        }
+
+    function getNumberOfOwnerAuctions() public returns (uint) {
+        return ownerOfAuctions[msg.sender].length;
+    }
+
+    function getOwnerAuction(uint idx) public returns (Auction memory) {
+        return ownerOfAuctions[msg.sender][idx];
     }
 
     function getHash(uint value, bytes32 secret) public view returns (bytes32) {
