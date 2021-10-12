@@ -9,8 +9,6 @@ contract BaseAuction {
     }
 
     address public beneficiary;
-    uint public biddingEnd;
-    uint public revealEnd;
     bool public ended;
     uint itemId;
 
@@ -21,12 +19,8 @@ contract BaseAuction {
     mapping(address => Bid) public bids;
     mapping(address => uint) pendingReturns;
     mapping(address => string) publicKeys;
-
-    modifier onlyBefore(uint _time) {require(now < _time); _; }
-    modifier onlyAfter(uint _time) {require(now > _time); _; }
-
     
-    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) onlyBefore(biddingEnd) public {
+    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) public {
         bids[bidder] = Bid({blindedBid: _blindedBid, publicKey: publicKey});
     }
     function reveal(uint value, bytes32 _secret, address bidder) public returns (uint);

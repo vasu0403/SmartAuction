@@ -2,13 +2,13 @@
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
-import './SecondPriceAuction.sol';
-import './AveragePriceAuction.sol';
+// import './SecondPriceAuction.sol';
+// import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
     enum State {UNDEFINED, AVAILABLE, PENDING_DELIVERY, DELIVERED}
-    enum AuctionState {UNDEFINED, RUNNING, PENDING_DELIVERY, DELIEVERED}
+    enum AuctionState {UNDEFINED, RUNNING, REVEAL_TIME, PENDING_DELIVERY, DELIEVERED}
 
     struct Listing {
         uint listingID;
@@ -23,9 +23,6 @@ contract SmartStore {
         string itemName;
         string itemDescription;
         address sellerId;
-        uint startTime;
-        uint biddingTime;
-        uint revealTime;
         string method;
     }
 
@@ -67,7 +64,8 @@ contract SmartStore {
     Auction[] private auctions;
 
     uint listingCounter = 0;
-    uint auctionCounter = 0;
+
+    mapping(address => Auction[]) ownerOfAuctions;
 
     modifier onlyAvailable(uint itemID) {
         require (
@@ -114,28 +112,31 @@ contract SmartStore {
             return false;
         }
     }
-    function factory(uint biddingTime, uint revealTime, address creator, string memory method) public returns(BaseAuction){
+    function factory(address creator, string memory method) public returns(BaseAuction){
         if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
-            return new FirstPriceAuction(biddingTime, revealTime, creator);
+            return new FirstPriceAuction(creator);
         } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-            return new SecondPriceAuction(biddingTime, revealTime, creator); 
+            // return new SecondPriceAuction(creator); 
         } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-            return new AveragePriceAuction(biddingTime, revealTime, creator); 
+            // return new AveragePriceAuction(creator); 
         }
     }
-    function addAuction(string memory itemName, string memory itemDescription, uint biddingTime, uint revealTime, string memory method) public {
-        Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, now, biddingTime, revealTime, method);
+    function addAuction(string memory itemName, string memory itemDescription, string memory method) public {
+        Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, method);
         auctions.push(auction);
-        auctionContracts[listingCounter] = factory(biddingTime, revealTime, msg.sender, method);
+        auctionContracts[listingCounter] = factory(msg.sender, method);
         sellers[listingCounter] = msg.sender;
         auctionStatus[listingCounter] = AuctionState.RUNNING;
         listingCounter++;
+        ownerOfAuctions[msg.sender].push(auction);
     }
 
     function placeBid(uint auctionID, bytes32 _blindedBid, string memory publicKey) public{
+        require(auctionStatus[auctionID] == AuctionState.RUNNING, "Bidding Period is over"); 
         auctionContracts[auctionID].bid(msg.sender, _blindedBid, publicKey);
     }
     function revealBid(uint auctionID, uint value, bytes32 secret) public payable{
+        require(auctionStatus[auctionID] == AuctionState.REVEAL_TIME, "Reveal time is either over, or has not started yet");
         uint refundAmount = auctionContracts[auctionID].reveal(value, secret, msg.sender);
         address payable bidderAddress = msg.sender;
         bidderAddress.transfer(refundAmount);
@@ -144,7 +145,7 @@ contract SmartStore {
         uint available = 0;
         for(uint i = 0; i < auctions.length; i++) {
             uint itemID = auctions[i].auctionID;
-            if(now < auctions[i].startTime + auctions[i].biddingTime) {
+            if(auctionStatus[itemID] == AuctionState.RUNNING) {
                 available++;
             }
         }
@@ -153,14 +154,26 @@ contract SmartStore {
         uint index = 0;
         for(uint i = 0; i < auctions.length; i++) {
             uint itemID = auctions[i].auctionID;
-            if(now < auctions[i].startTime + auctions[i].biddingTime) {
+            if(auctionStatus[itemID] == AuctionState.RUNNING) {
                 activeAuctions[index++] = auctions[i];
             }
         }
         return activeAuctions;
     }
+    function endBiddingTime(uint auctionID) public {
+        bool found = false;
+        for(uint i = 0; i < ownerOfAuctions[msg.sender].length; i++) {
+            if(ownerOfAuctions[msg.sender][i].auctionID == auctionID) {
+                found = true;
+                break;
+            }
+        }
+        require(found == true, "You are not the owner of this auction");
+        require(auctionStatus[auctionID] == AuctionState.RUNNING, "Bidding has not started or has already ended");
+        auctionStatus[auctionID] = AuctionState.REVEAL_TIME;
+    }
     function endAuction(uint auctionID) public {
-        if(auctionStatus[auctionID] != AuctionState.RUNNING) {
+        if(auctionStatus[auctionID] != AuctionState.REVEAL_TIME) {
             return;
         }
         if(auctionContracts[auctionID].canEnd()) {
@@ -186,12 +199,12 @@ contract SmartStore {
         return auctions.length;
     }
 
-    function getParticularAuction(uint idx) public view returns (Auction memory) {
+    function getParticularAuction(uint idx) public returns (Auction memory) {
         return auctions[idx];
     }
 
-    function getStatusOfAuction(uint auctionID, uint idx) public view returns (bool) {
-        if(auctionStatus[auctionID] == AuctionState.RUNNING && now < auctions[idx].startTime + auctions[idx].biddingTime) {
+    function getStatusOfAuction(uint auctionID, uint idx) public returns (bool) {
+        if(auctionStatus[auctionID] == AuctionState.RUNNING) {
             return true;
         } else {
             return false;

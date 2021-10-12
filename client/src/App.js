@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import SmartStore from "./contracts/SmartStore.json";
 import getWeb3 from "./getWeb3";
 import Forms from './components/Forms'
@@ -100,7 +99,8 @@ class App extends Component {
 		for(let i = 0; i < numberOfAuctions; i++){
 			const data = await contract.methods.getParticularAuction(i).call();
 			console.log(data);
-			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID, i).call();
+			const auctionStatus = await contract.methods.getStatusOfAuction(data.auctionID, i).send({from: accounts[0]});
+			console.log(auctionStatus);
 			if(auctionStatus){
 				auctions.push({
 					itemName: data.itemName,
@@ -127,7 +127,7 @@ class App extends Component {
 
 	placeBid = async(auctionId, _blindedBid, publicKey) => {
 		const {accounts, contract} = this.state;
-		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).call({from: accounts[0]});
+		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).send({from: accounts[0]});
 	}
 
 	getPendingDeliveries = async() => {
