@@ -8,7 +8,7 @@ contract BaseAuction {
         string publicKey;
     }
 
-    address payable public beneficiary;
+    address public beneficiary;
     uint public biddingEnd;
     uint public revealEnd;
     bool public ended;
@@ -26,9 +26,22 @@ contract BaseAuction {
     modifier onlyAfter(uint _time) {require(now > _time); _; }
 
     
-    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) public;
+    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) onlyBefore(biddingEnd) public {
+        bids[bidder] = Bid({blindedBid: _blindedBid, publicKey: publicKey});
+    }
     function reveal(uint value, bytes32 _secret, address bidder) public returns (uint);
     function placeBid(address bidder, uint value, string memory publicKey) internal returns(bool);
-    function pendingMoney(address bidder) public returns (uint);
+    function pendingMoney(address bidder) public returns (uint){
+        uint amount = pendingReturns[bidder];
+        if (amount > 0) {
+            // It is important to set this to zero because the recipient
+            // can call this function again as part of the receiving call
+            // before `transfer` returns (see the remark above about
+            // conditions -> effects -> interaction).
+
+            pendingReturns[bidder] = 0;
+        }
+        return amount;
+    }
     function canEnd() public returns(bool);
 }

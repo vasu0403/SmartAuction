@@ -4,11 +4,13 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import './BaseAuction.sol';
 
-contract FirstPriceAuction is BaseAuction {
-    constructor(uint _biddingTime, uint _revealTime, address  _beneficiary) public {
+contract SecondPriceAuction is BaseAuction {
+    uint secondHighestBid;
+    constructor(uint _biddingTime, uint _revealTime, address _beneficiary) public {
         beneficiary = _beneficiary;
         biddingEnd = now + _biddingTime;
         revealEnd = biddingEnd + _revealTime;
+        secondHighestBid = 0;
     }
     
     function reveal(uint value, bytes32 secret, address bidder) onlyAfter(biddingEnd) onlyBefore(revealEnd) public returns (uint){
@@ -24,12 +26,20 @@ contract FirstPriceAuction is BaseAuction {
         return refund;
     }
     function placeBid(address bidder, uint value, string memory publicKey) internal returns(bool){
-        if (value <= winningBid) {
+        if (value < winningBid) {
+            if(secondHighestBid < value) {
+                secondHighestBid = value;
+            }
             return false;
         }
         if (winner != address(0)) {
             // Refund the previously highest bidder.
             pendingReturns[winner] += winningBid;
+        }
+        if(winningBid == 0) {
+            secondHighestBid = value;
+        } else {
+            secondHighestBid = winningBid;
         }
         winningBid = value;
         winner = bidder;
@@ -37,7 +47,9 @@ contract FirstPriceAuction is BaseAuction {
         return true;
     }
     function canEnd() public returns(bool){
-        if(block.timestamp > revealEnd) {
+        if(!ended && block.timestamp > revealEnd) {
+            pendingReturns[winner] += (winningBid - secondHighestBid);
+            winningBid = secondHighestBid;
             ended = true;
             return true;
         }
