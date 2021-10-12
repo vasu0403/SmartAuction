@@ -10,6 +10,7 @@ contract SmartStore {
     /// @author Heisenberg team
 
     enum State {UNDEFINED, AVAILABLE, PENDING_DELIVERY, DELIVERED}
+    enum AuctionState {UNDEFINED, RUNNING, PENDING_DELIVERY, DELIEVERED}
 
     struct Listing {
         uint listingID;
@@ -62,6 +63,7 @@ contract SmartStore {
     mapping(address => BoughtItem[]) myItems;
     mapping(uint => BaseAuction) auctionContracts;
 
+    mapping(uint => AuctionState) auctionStatus;
     /// @dev list of all products. Also includes products which have already been sold
     Listing[] private listings;
     Auction[] private auctions;
@@ -116,17 +118,19 @@ contract SmartStore {
     }
 
     function addAuction(string memory itemName, string memory itemDescription, uint biddingTime, uint revealTime, string memory method) public {
-        Auction memory auction = Auction(auctionCounter, itemName, itemDescription, msg.sender, now, biddingTime, revealTime, method);
+        Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, now, biddingTime, revealTime, method);
         auctions.push(auction);
-        auctionContracts[auctionCounter] = new FirstPriceAuction(biddingTime, revealTime, msg.sender);
-        auctionCounter++;
+        auctionContracts[listingCounter] = new FirstPriceAuction(biddingTime, revealTime, msg.sender);
+        sellers[listingCounter] = msg.sender;
+        auctionStatus[listingCounter] = AuctionState.RUNNING;
+        listingCounter++;
     }
 
-    function placeBid(uint auctionID, bytes32 _blindedBid) public payable{
-        auctionContracts[auctionID].bid(msg.sender, _blindedBid, msg.value);
+    function placeBid(uint auctionID, bytes32 _blindedBid, string memory publicKey) public{
+        auctionContracts[auctionID].bid(msg.sender, _blindedBid, publicKey);
     }
-    function revealBid(uint auctionID, uint[] memory values, bool[] memory fake, bytes32 secret) public {
-        uint refundAmount = auctionContracts[auctionID].reveal(values, fake, secret, msg.sender);
+    function revealBid(uint auctionID, uint value, bytes32 secret) public payable{
+        uint refundAmount = auctionContracts[auctionID].reveal(value, secret, msg.sender);
         address payable bidderAddress = msg.sender;
         bidderAddress.transfer(refundAmount);
     }
@@ -149,8 +153,30 @@ contract SmartStore {
         }
         return activeAuctions;
     }
-    function getHash(uint value, bool fake, bytes32 secret) public view returns (bytes32) {
-        bytes32 hash = keccak256(abi.encodePacked(value, fake, secret));
+    function endAuction(uint auctionID) public {
+        if(auctionStatus[auctionID] != AuctionState.RUNNING) {
+            return;
+        }
+        if(auctionContracts[auctionID].canEnd()) {
+            auctionStatus[auctionID] = AuctionState.PENDING_DELIVERY;
+            address winner = auctionContracts[auctionID].winner();
+            uint amount = auctionContracts[auctionID].winningBid();
+            string memory publicKeyOfWinner = auctionContracts[auctionID].publicKeyOfWinner();
+            buyers[auctionID] = winner;
+            Auction memory currentAuction;
+            status[auctionID] = State.PENDING_DELIVERY;
+            for(uint i = 0; i < auctions.length; i++) {
+                if(auctionID == auctions[i].auctionID) {
+                    currentAuction = auctions[i];
+                    break;
+                }
+            }
+            PendingItem memory pendingItem = PendingItem(currentAuction.auctionID, currentAuction.itemName, currentAuction.itemDescription, amount, publicKeyOfWinner);
+            pendingDeliveries[currentAuction.sellerId].push(pendingItem);
+        }
+    } 
+    function getHash(uint value, bytes32 secret) public view returns (bytes32) {
+        bytes32 hash = keccak256(abi.encodePacked(value, secret));
         return hash;
     }
     /**
@@ -184,15 +210,20 @@ contract SmartStore {
      * @param publicKey publick key which will be used for encrypting the product string by the seller. Buyer must have the corresponding private key to decrypt the message
      */
     function buyListing(uint itemID, string memory publicKey) public onlyAvailable(itemID) payable {
+        Listing memory item;
+        for(uint i = 0; i < listings.length; i++) {
+            if(listings[i].listingID == itemID) {
+                item = listings[i];
+                break;
+            }
+        }
         require (
-            msg.value == listings[itemID].askingPrice,
+            msg.value == item.askingPrice,
             "Sent amount should be equal to asking price !"
         );
         
 
         buyers[itemID] = msg.sender;
-
-        Listing memory item = listings[itemID];
 
         status[itemID] = State.PENDING_DELIVERY;
         
@@ -233,8 +264,10 @@ contract SmartStore {
         status[itemID] = State.DELIVERED;
 
         uint len = pendingDeliveries[msg.sender].length;
+        PendingItem memory pendingItem;
         for(uint i = 0; i < len; i++) {
             if(pendingDeliveries[msg.sender][i].listingID == itemID) {
+                pendingItem = pendingDeliveries[msg.sender][i];
                 pendingDeliveries[msg.sender][i] = pendingDeliveries[msg.sender][len - 1];
                 delete pendingDeliveries[msg.sender][len - 1];
                 pendingDeliveries[msg.sender].length--;
@@ -243,13 +276,12 @@ contract SmartStore {
         }
 
         address buyerAddress = buyers[itemID];
-        Listing memory item = listings[itemID];
-        BoughtItem memory boughtItem = BoughtItem(item.listingID, item.itemName, item.itemDescription, itemText);
+        BoughtItem memory boughtItem = BoughtItem(pendingItem.listingID, pendingItem.itemName, pendingItem.itemDescription, itemText);
 
         myItems[buyerAddress].push(boughtItem);  
         
         address payable sellerAddress = msg.sender;
-        sellerAddress.transfer(listings[itemID].askingPrice);
+        sellerAddress.transfer(pendingItem.askingPrice);
     }
 
     /**

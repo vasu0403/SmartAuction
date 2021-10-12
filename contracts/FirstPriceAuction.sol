@@ -5,48 +5,37 @@ pragma solidity >=0.4.22 <0.9.0;
 import './BaseAuction.sol';
 
 contract FirstPriceAuction is BaseAuction {
-    uint highestBid;
-    address highestBidder;
     constructor(uint _biddingTime, uint _revealTime, address payable _beneficiary) public {
         beneficiary = _beneficiary;
         biddingEnd = now + _biddingTime;
         revealEnd = biddingEnd + _revealTime;
     }
-    function bid(address bidder, bytes32 _blindedBid, uint deposit) onlyBefore(biddingEnd) public {
-        bids[bidder].push(Bid({blindedBid: _blindedBid, deposit: deposit}));
+    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) onlyBefore(biddingEnd) public {
+        bids[bidder] = Bid({blindedBid: _blindedBid, publicKey: publicKey});
     }
-    function reveal(uint[] memory values, bool[] memory fakes, bytes32 secrets, address bidder) onlyAfter(biddingEnd) onlyBefore(revealEnd) public returns (uint){
-        uint length = bids[bidder].length;
-        require(values.length == length);
-        require(fakes.length == length);
-        // require(secrets.length == length);
-
+    function reveal(uint value, bytes32 secret, address bidder) onlyAfter(biddingEnd) onlyBefore(revealEnd) public returns (uint){
         uint refund = 0;
-        for(uint i = 0; i < length; i++) {
-            Bid storage bidToCheck  = bids[bidder][i];
-            (uint value, bool fake, bytes32 secret) = (values[i], fakes[i], secrets);
-            if (bidToCheck.blindedBid != keccak256(abi.encodePacked(value, fake, secret))) {
-                continue;
-            }
-            refund += bidToCheck.deposit;
-            if (!fake && bidToCheck.deposit >= value) {
-                if (placeBid(bidder, value))
-                    refund -= value;
-            }
-            bidToCheck.blindedBid = bytes32(0);
+        Bid storage bidToCheck  = bids[bidder];
+        if (bidToCheck.blindedBid != keccak256(abi.encodePacked(value, secret))) {
+            return value;
         }
+        refund += value;
+        if (placeBid(bidder, value, bidToCheck.publicKey))
+            refund -= value;
+        bidToCheck.blindedBid = bytes32(0);
         return refund;
     }
-    function placeBid(address bidder, uint value) internal returns(bool){
-        if (value <= highestBid) {
+    function placeBid(address bidder, uint value, string memory publicKey) internal returns(bool){
+        if (value <= winningBid) {
             return false;
         }
-        if (highestBidder != address(0)) {
+        if (winner != address(0)) {
             // Refund the previously highest bidder.
-            pendingReturns[highestBidder] += highestBid;
+            pendingReturns[winner] += winningBid;
         }
-        highestBid = value;
-        highestBidder = bidder;
+        winningBid = value;
+        winner = bidder;
+        publicKeyOfWinner = publicKey;
         return true;
     }
     function pendingMoney(address bidder) public returns (uint){
@@ -61,8 +50,11 @@ contract FirstPriceAuction is BaseAuction {
         }
         return amount;
     }
-    function auctionEnd() public {
-        ended = true;
-        beneficiary.transfer(highestBid);
+    function canEnd() public returns(bool){
+        if(block.timestamp > revealEnd) {
+            ended = true;
+            return true;
+        }
+        return false;
     }
 }

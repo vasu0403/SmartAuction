@@ -5,7 +5,7 @@ pragma solidity >=0.4.22 <0.9.0;
 contract BaseAuction {
     struct Bid {
         bytes32 blindedBid;
-        uint deposit;
+        string publicKey;
     }
 
     address payable public beneficiary;
@@ -14,16 +14,21 @@ contract BaseAuction {
     bool public ended;
     uint itemId;
 
-    mapping(address => Bid[]) public bids;
+    uint public winningBid;
+    address public winner;
+    string public publicKeyOfWinner;
+
+    mapping(address => Bid) public bids;
     mapping(address => uint) pendingReturns;
+    mapping(address => string) publicKeys;
 
     modifier onlyBefore(uint _time) {require(now < _time); _; }
     modifier onlyAfter(uint _time) {require(now > _time); _; }
 
     
-    function bid(address bidder, bytes32 _blindedBid, uint deposit) public;
-    function reveal(uint[] memory _values, bool[] memory _fake, bytes32 _secret, address bidder) public returns (uint);
-    function placeBid(address bidder, uint value) internal returns(bool);
+    function bid(address bidder, bytes32 _blindedBid, string memory publicKey) public;
+    function reveal(uint value, bytes32 _secret, address bidder) public returns (uint);
+    function placeBid(address bidder, uint value, string memory publicKey) internal returns(bool);
     function pendingMoney(address bidder) public returns (uint);
-    function auctionEnd() public;
+    function canEnd() public returns(bool);
 }
