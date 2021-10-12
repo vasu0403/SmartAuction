@@ -51,6 +51,6 @@ To view all the live auctions, ```getAuctions()``` functions can be called which
 
 Buyers are allowed to place only one bid for a product. To place a bid, the buyer must call the ```placeBid()``` function and provide the auction ID, a bid value and a public key (the private key for which is with the buyer). After some time, the owner of the auction, i.e. the seller, can decide to stop the bidding phase for an auction by calling the ```endBiddingTime``` function. Once the bidding phase for an auction ends, the bidders can now reveal their bids and transfer balance to the wallet using the ```revealBid``` function which takes the auctionID, the bid value and the public key as its arguments. If a bidder does not reveal their bid before the auction ends, they will not be considered for the final result of the auction. The seller can end an auction by calling ```endAuction()``` function. This function calculates the winner of the auction by calling the appropriate method of the auction object, changes the state of the auction to ```PENDING_DELIVERY``` and settles all the balances after deducting the price of the winning bid. After this step, the item corresponding to the auction gets added to the corresponding sellers list in ```pendingDeliveries```. After this, the process is the same as for ```Listings```.
 
-**Note: To generate keys, go to ```/keys```**
+**Note: To generate keys, go to ```/keys```. Take public key and private key from the alert bar. To see the enrypted and decrypted message, you will have to open the console**
 
 
