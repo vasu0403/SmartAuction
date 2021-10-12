@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
-import './FirstPriceAuction.sol';
-// import './SecondPriceAuction.sol';
+// import './FirstPriceAuction.sol';
+import './SecondPriceAuction.sol';
 // import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
@@ -10,6 +10,7 @@ contract SmartStore {
     enum State {UNDEFINED, AVAILABLE, PENDING_DELIVERY, DELIVERED}
     enum AuctionState {UNDEFINED, RUNNING, REVEAL_TIME, PENDING_DELIVERY, DELIEVERED}
 
+    /// @dev structure representing a listing
     struct Listing {
         uint listingID;
         string itemName;
@@ -18,6 +19,7 @@ contract SmartStore {
         address sellerID;
     }
 
+    /// @dev structure representing an auction
     struct Auction {
         uint auctionID;
         string itemName;
@@ -26,6 +28,7 @@ contract SmartStore {
         string method;
     }
 
+    /// @dev structure representing an item which has not yet been delivered by the seller
     struct PendingItem {
         uint listingID;
         string itemName;
@@ -34,6 +37,7 @@ contract SmartStore {
         string publicKey;
     }
 
+    /// @dev structure representing an item which has been delivered by the seller
     struct BoughtItem {
         uint listingID;
         string itemName;
@@ -56,17 +60,23 @@ contract SmartStore {
     mapping(uint => State) status;
     /// @dev list of items which each person has bought and has been deliverd
     mapping(address => BoughtItem[]) myItems;
+    /// @dev for each action id, the map stores its correcponding auction contract (which can be of 3 different types)
     mapping(uint => BaseAuction) auctionContracts;
-
+    /// @dev for each action id, stores whether auction is running or reveal period is going on, or if auction has ended
     mapping(uint => AuctionState) auctionStatus;
+    /// @dev for each action id, the address of bidders who paid money during reveal period
+    mapping(uint => address payable[]) bidders;
+    /// @dev for each person, stores the action which he owns
+    mapping(address => Auction[]) ownerOfAuctions;
+    
     /// @dev list of all products. Also includes products which have already been sold
     Listing[] private listings;
+    /// @dev list of all auctions. Also includes auctions which are over
     Auction[] private auctions;
-    mapping(uint => address payable[]) bidders;
 
+    /// @dev a unique id for each auction and listing
     uint listingCounter = 0;
 
-    mapping(address => Auction[]) ownerOfAuctions;
 
     modifier onlyAvailable(uint itemID) {
         require (
@@ -98,14 +108,25 @@ contract SmartStore {
         listings.push(listing);
         listingCounter++;
     }
+    /**
+     * @notice returns the length of listings array
+     */
     function getNumberOfListings() public returns (uint) {
         return listings.length;
     }
 
+    /**
+     * @notice returns listing at particual index
+     * @param idx index of the reuired item
+     */
     function getParticularListing(uint idx) public view returns (Listing memory) {
         return listings[idx];
     }
 
+    /**
+     * @notice used for getting the status of a listing with a particular item ID.
+     * @param itemID id of item for which status is required
+     */
     function getStatusOfListing(uint itemID) public view returns (bool) {
         if(status[itemID] == State.AVAILABLE) {
             return true;
@@ -113,15 +134,29 @@ contract SmartStore {
             return false;
         }
     }
+
+    
+    /**
+     * @notice used for returning the correct type of auction based on user input
+     * @param creator the addres of the owner of the auction
+     * @param method the type of auction (must be one of FirstPrice, SecondPrice or AveragePrice)
+     */
     function factory(address creator, string memory method) public returns(BaseAuction){
         if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
-            return new FirstPriceAuction(creator);
+            // return new FirstPriceAuction(creator);
         } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-            // return new SecondPriceAuction(creator); 
+            return new SecondPriceAuction(creator); 
         } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
             // return new AveragePriceAuction(creator); 
         }
     }
+
+    /**
+     * @notice used for starting a new auction
+     * @param itemName The name of item which is up for bidding
+     * @param itemDescription description of item
+     * @param method the type of auction (must be one of FirstPrice, SecondPrice or AveragePrice)
+     */
     function addAuction(string memory itemName, string memory itemDescription, string memory method) public {
         Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, method);
         auctions.push(auction);
@@ -132,10 +167,23 @@ contract SmartStore {
         ownerOfAuctions[msg.sender].push(auction);
     }
 
+    /**
+     * @notice used for placing a bid on a particular auction
+     * @param auctionID id of auction on which bid is being placed
+     * @param _blindedBid hash of the actual bid
+     * @param publicKey the public key with which seller can encrypt the item text
+     */
     function placeBid(uint auctionID, bytes32 _blindedBid, string memory publicKey) public{
         require(auctionStatus[auctionID] == AuctionState.RUNNING, "Bidding Period is over"); 
         auctionContracts[auctionID].bid(msg.sender, _blindedBid, publicKey);
     }
+
+    /**
+     * @notice used for revealing a bid on a particular auction
+     * @param auctionID id of auction on which bid is being revealed
+     * @param value the actual bid
+     * @param secret the key using which bid was blinded when placing
+     */
     function revealBid(uint auctionID, uint value, bytes32 secret) public payable{
         require(auctionStatus[auctionID] == AuctionState.REVEAL_TIME, "Reveal time is either over, or has not started yet");
         bidders[auctionID].push(msg.sender);
@@ -143,6 +191,10 @@ contract SmartStore {
         address payable bidderAddress = msg.sender;
         bidderAddress.transfer(refundAmount);
     }
+
+    /**
+     * @notice used for getting all the auctions
+     */
     function getAuctions() public view returns (Auction[] memory) {
         uint available = 0;
         for(uint i = 0; i < auctions.length; i++) {
@@ -162,6 +214,11 @@ contract SmartStore {
         }
         return activeAuctions;
     }
+
+    /**
+     * @notice used for ending the bidding period of a particular auction
+     * @param auctionID id of auction for which bidding period is to be stopped
+     */
     function endBiddingTime(uint auctionID) public {
         bool found = false;
         for(uint i = 0; i < ownerOfAuctions[msg.sender].length; i++) {
@@ -174,6 +231,11 @@ contract SmartStore {
         require(auctionStatus[auctionID] == AuctionState.RUNNING, "Bidding has not started or has already ended");
         auctionStatus[auctionID] = AuctionState.REVEAL_TIME;
     }
+
+    /**
+     * @notice used for ending a particular auction
+     * @param auctionID id of auction which is to be stopped
+     */
     function endAuction(uint auctionID) public {
         if(auctionStatus[auctionID] != AuctionState.REVEAL_TIME) {
             return;
@@ -201,10 +263,16 @@ contract SmartStore {
         }
     }
 
+    /**
+     * @notice returns the length of auctions array
+     */
     function getNumberOfAuctions() public returns (uint) {
         return auctions.length;
     }
 
+    /**
+     * @notice used for getting the auction at a particular index
+     */
     function getParticularAuction(uint idx) public returns (Auction memory) {
         return auctions[idx];
     }
@@ -281,6 +349,7 @@ contract SmartStore {
     function getPendingTransactions() public view returns (PendingItem[] memory) {
         return pendingDeliveries[msg.sender];
     }
+
 
     function getNumberOfPendingTransactions() public returns (uint) {
         return pendingDeliveries[msg.sender].length;
