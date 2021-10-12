@@ -99,6 +99,7 @@ class Auction extends Component{
 							style={{width: "50%"}}
 							onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
 						/>
+						{this.props.type === "bidding" ?
 						<TextField 
 							label="Key to Hash Bid" 
 							variant="outlined" 
@@ -106,7 +107,7 @@ class Auction extends Component{
 							className="textField"
 							style={{width: "50%"}}
 							onChange={(newValue) => {this.changeBidKey(newValue.target.value)}}
-						/>
+						/> : <div></div>}
 					</div> :
 					<div></div>
 				}

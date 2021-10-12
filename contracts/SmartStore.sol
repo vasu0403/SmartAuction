@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
-// import './FirstPriceAuction.sol';
+import './FirstPriceAuction.sol';
 import './SecondPriceAuction.sol';
-// import './AveragePriceAuction.sol';
+import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -142,15 +142,15 @@ contract SmartStore {
      * @param method the type of auction (must be one of FirstPrice, SecondPrice or AveragePrice)
      */
     function factory(address creator, string memory method) public returns(BaseAuction){
-        // if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
-        //     return new FirstPriceAuction(creator);
-        // } else 
-        if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
+        if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
+            return new FirstPriceAuction(creator);
+        } 
+        else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
             return new SecondPriceAuction(creator); 
         } 
-        // else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-        //     return new AveragePriceAuction(creator); 
-        // }
+        else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
+            return new AveragePriceAuction(creator); 
+        }
     }
 
     /**
