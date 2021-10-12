@@ -5,13 +5,11 @@ pragma solidity >=0.4.22 <0.9.0;
 import './BaseAuction.sol';
 
 contract FirstPriceAuction is BaseAuction {
-    constructor(uint _biddingTime, uint _revealTime, address  _beneficiary) public {
+    constructor(address  _beneficiary) public {
         beneficiary = _beneficiary;
-        biddingEnd = now + _biddingTime;
-        revealEnd = biddingEnd + _revealTime;
     }
     
-    function reveal(uint value, bytes32 secret, address bidder) onlyAfter(biddingEnd) onlyBefore(revealEnd) public returns (uint){
+    function reveal(uint value, bytes32 secret, address bidder)public returns (uint){
         uint refund = 0;
         Bid storage bidToCheck  = bids[bidder];
         if (bidToCheck.blindedBid != keccak256(abi.encodePacked(value, secret))) {
@@ -37,7 +35,7 @@ contract FirstPriceAuction is BaseAuction {
         return true;
     }
     function canEnd() public returns(bool){
-        if(block.timestamp > revealEnd) {
+        if(!ended) {
             ended = true;
             return true;
         }

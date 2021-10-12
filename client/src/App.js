@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import SmartStore from "./contracts/SmartStore.json";
 import getWeb3 from "./getWeb3";
 import Forms from './components/Forms'
