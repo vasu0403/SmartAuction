@@ -105,6 +105,25 @@ class App extends Component {
 	return pendingDeliveries;
   }
 
+  getOrders = async() => {
+	const {accounts, contract} = this.state;
+	console.log("getting your orders");
+	let numberOfOrders = await contract.methods.getNumberOfItems().call({from: accounts[0]});
+	var yourOrders = [];
+	console.log(numberOfOrders)
+	for(let i = 0;i < numberOfOrders; i++){
+		const data = await contract.methods.getParticularOrderItem(i).call({from: accounts[0]});
+		yourOrders.push({
+			itemText: data.itemText,
+			itemDescription: data.itemDescription,
+			listingID: data.listingID,
+			itemName: data.itemName,
+		});
+	}
+	console.log(yourOrders);
+	return yourOrders;
+  }
+
   render() {
 	if (!this.state.web3) {
 	  return <div>Loading Web3, accounts, and contract...</div>;
@@ -117,7 +136,7 @@ class App extends Component {
 						<Home getListings={this.getListings} buyListing={this.buyListing}/>
 					</Route>
 					<Route path='/profile'>
-						<Profile getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing}/>
+						<Profile getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
 					</Route>
 					<Route path='/forms'>
 						<Forms addListing={this.addListing}/>

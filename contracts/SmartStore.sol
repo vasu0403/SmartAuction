@@ -259,4 +259,12 @@ contract SmartStore {
     function getItems() public view returns (BoughtItem[] memory){
         return myItems[msg.sender];
     }
+
+    function getNumberOfItems() public returns (uint) {
+        return myItems[msg.sender].length;
+    }
+
+    function getParticularOrderItem(uint idx) public view returns (BoughtItem memory) {
+        return myItems[msg.sender][idx];
+    }    
 }

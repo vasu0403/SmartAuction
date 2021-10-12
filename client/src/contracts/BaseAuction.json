@@ -190,7 +190,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\npragma experimental ABIEncoderV2;\npragma solidity >=0.4.22 <0.9.0;\n\ncontract BaseAuction {\n    struct Bid {\n        bytes32 blindedBid;\n        uint deposit;\n    }\n\n    address payable public beneficiary;\n    uint public biddingEnd;\n    uint public revealEnd;\n    bool public ended;\n    uint itemId;\n\n    mapping(address => Bid[]) public bids;\n    mapping(address => uint) pendingReturns;\n\n    modifier onlyBefore(uint _time) {require(now < _time); _; }\n    modifier onlyAfter(uint _time) {require(now > _time); _; }\n\n    \n    function bid(address bidder, bytes32 _blindedBid, uint deposit) public;\n    function reveal(uint[] memory _values, bool[] memory _fake, bytes32 _secret, address bidder) public returns (uint);\n    function placeBid(address bidder, uint value) internal returns(bool);\n    function pendingMoney(address bidder) public returns (uint);\n    function auctionEnd() public;\n}",
-  "sourcePath": "/home/vasu0403/college/sem7/Blockchain/SmartAuction/contracts/BaseAuction.sol",
+  "sourcePath": "/home/daksh0225/Sem7/DTB/SmartAuction/contracts/BaseAuction.sol",
   "ast": {
     "absolutePath": "project:/contracts/BaseAuction.sol",
     "exportedSymbols": {
@@ -2558,7 +2558,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-12T05:29:03.672Z",
+  "updatedAt": "2021-10-12T08:40:58.085Z",
   "devdoc": {
     "methods": {}
   },

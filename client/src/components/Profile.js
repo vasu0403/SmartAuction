@@ -13,6 +13,7 @@ import Auctions from './Auctions';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import PendingDeliveries from './PendingDeliveries';
+import BoughtItems from './BoughtItems';
 
 const styles = theme => ({
 	root: {
@@ -54,9 +55,9 @@ class Profile extends Component{
 					</Toolbar>
 				</AppBar>
 				<Tabs
-					value={this.tabValue}
+					value={this.state.tabValue}
 					indicatorColor="primary"
-					textColor="secondary"
+					textColor="primary"
 					onChange={this.changeTab}
 					aria-label="tabs example"
 					centered
@@ -67,7 +68,7 @@ class Profile extends Component{
 				</Tabs>
 				{
 					this.state.tabValue === "0" ?
-						<div> hello </div> :
+						<BoughtItems getOrders={this.props.getOrders}/> :
 						<PendingDeliveries getPendingDeliveries = {this.props.getPendingDeliveries} deliverListing = {this.props.deliverListing}/>
 				}
 

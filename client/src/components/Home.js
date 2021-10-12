@@ -53,9 +53,9 @@ class Home extends Component{
 					</Toolbar>
 				</AppBar>
 				<Tabs
-				value={this.tabValue}
+				value={this.state.tabValue}
 				indicatorColor="primary"
-				textColor="secondary"
+				textColor="primary"
 				onChange={this.changeTab}
 				aria-label="tabs example"
 				centered
