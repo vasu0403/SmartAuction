@@ -2,10 +2,8 @@
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
+import './SecondPriceAuction.sol';
 
-contract Factory {
-    
-}
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -116,11 +114,17 @@ contract SmartStore {
             return false;
         }
     }
-
+    function factory(uint biddingTime, uint revealTime, address creator, string memory method) public returns(BaseAuction){
+        if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
+            return new FirstPriceAuction(biddingTime, revealTime, creator);
+        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
+            return new SecondPriceAuction(biddingTime, revealTime, creator);
+        }
+    }
     function addAuction(string memory itemName, string memory itemDescription, uint biddingTime, uint revealTime, string memory method) public {
         Auction memory auction = Auction(listingCounter, itemName, itemDescription, msg.sender, now, biddingTime, revealTime, method);
         auctions.push(auction);
-        auctionContracts[listingCounter] = new FirstPriceAuction(biddingTime, revealTime, msg.sender);
+        auctionContracts[listingCounter] = factory(biddingTime, revealTime, msg.sender, method);
         sellers[listingCounter] = msg.sender;
         auctionStatus[listingCounter] = AuctionState.RUNNING;
         listingCounter++;
@@ -298,5 +302,10 @@ contract SmartStore {
 
     function getParticularOrderItem(uint idx) public view returns (BoughtItem memory) {
         return myItems[msg.sender][idx];
-    }    
+    } 
+    function getPendingMoney(uint auctionID) public {
+        uint amount = auctionContracts[auctionID].pendingMoney(msg.sender);
+        address payable bidderAddress = msg.sender;
+        bidderAddress.transfer(amount);
+    }   
 }
