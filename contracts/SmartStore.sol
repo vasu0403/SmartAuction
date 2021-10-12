@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
 import './SecondPriceAuction.sol';
-
+import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -118,7 +118,9 @@ contract SmartStore {
         if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
             return new FirstPriceAuction(biddingTime, revealTime, creator);
         } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-            return new SecondPriceAuction(biddingTime, revealTime, creator);
+            return new SecondPriceAuction(biddingTime, revealTime, creator); 
+        } else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
+            return new AveragePriceAuction(biddingTime, revealTime, creator); 
         }
     }
     function addAuction(string memory itemName, string memory itemDescription, uint biddingTime, uint revealTime, string memory method) public {
