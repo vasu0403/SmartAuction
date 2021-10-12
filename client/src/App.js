@@ -209,7 +209,7 @@ class App extends Component {
 				<div>
 					<Switch>
 						<Route exact path='/'>
-							<Home getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
+							<Home hasher={this.state.web3} getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/reveal'>
 							<Reveal getAuctions={this.getAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>

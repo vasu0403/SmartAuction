@@ -29,6 +29,7 @@ class Auction extends Component{
 			ordering: false,
 			publicKey: "",
             bid: "",
+			bidKey: "",
 			hash: ""
 		}
 	}
@@ -50,14 +51,21 @@ class Auction extends Component{
 			publicKey: newValue,
 		})
 	}
+	
+	changeBidKey(newValue) {
+		this.setState({
+			bidKey: newValue,
+		})
+	}
 
-    async placeBid(bidValue, secret){
-        // await this.props.getBidHash(bidValue, secret).then(result => this.setState({
-		// 	hash: result
-		// }));
-        // console.log("hash", this.state.hash);
+    async placeBid(bidValue, publicKey, bidKey){
+		const hash = this.props.hasher.utils.soliditySha3(
+			{t: 'uint256', v: bidValue},
+			{t: 'bytes32', v: bidKey}
+		)
+		alert("Your hashed bid is: " + hash)
 		console.log("hell owold")
-        this.props.placeBid(this.props.data.auctionID, "0xdd044e774ba476726a39ca417f8ccc829d3c1b0c9f9c85b027f9123d2d701d49", "public key 1");
+        this.props.placeBid(this.props.data.auctionID, hash, publicKey);
     }
 
 	async revealBid(bidValue, secret){
@@ -78,10 +86,9 @@ class Auction extends Component{
 					<div className='auctionTextFields'>
 						<TextField 
 							label="Bid Price" 
-							variant={this.props.type === "reveal" ? "standard" : "outlined"}
-							value={this.state.bid}
+							variant="standard"
 							className="textField"
-							type={this.props.type === "reveal" ? "number" : ""}
+							type="number"
 							onChange={(newValue) => {this.changeBid(newValue.target.value)}}
 							/>
 						<TextField 
@@ -92,6 +99,14 @@ class Auction extends Component{
 							style={{width: "50%"}}
 							onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
 						/>
+						<TextField 
+							label="Key to Hash Bid" 
+							variant="outlined" 
+							value={this.state.bidKey}
+							className="textField"
+							style={{width: "50%"}}
+							onChange={(newValue) => {this.changeBidKey(newValue.target.value)}}
+						/>
 					</div> :
 					<div></div>
 				}
@@ -99,7 +114,7 @@ class Auction extends Component{
 					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
 					{/* {this.state.ordering ? */}
 					{this.props.type === "bidding" ?
-					<Button color="primary" onClick={() => this.placeBid(this.state.bid, this.state.publicKey)}><b>Place Bid</b></Button> :
+					<Button color="primary" onClick={() => this.placeBid(this.state.bid, this.state.publicKey, this.state.bidKey)}><b>Place Bid</b></Button> :
 					<Button color="primary" onClick={() => this.revealBid(this.state.bid, this.state.publicKey)}><b>Reveal Bid</b></Button> }
 				</div>
 			</Card>
