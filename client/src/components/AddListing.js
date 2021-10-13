@@ -1,10 +1,13 @@
 import React, { Component } from "react";
-import { Form, Input, Button, InputNumber} from 'antd';
+// import { Form, Input, Button, InputNumber} from 'antd';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
 export default class AddListing extends Component {
     state = {
         itemName: "",
         itemDescription: "",
-        askingPrice: "",
+        askingPrice: 0,
     }
     setItemName(newItemName) {
         this.setState({
@@ -24,6 +27,18 @@ export default class AddListing extends Component {
         })
     }
     submit() {
+        if(this.state.itemName == "") {
+            alert("item name cannot be empty");
+            return;
+        }
+        if(this.state.itemDescription == "") {
+            alert("item Description cannot be empty");
+            return;
+        }
+        if(this.state.askingPrice < 0) {
+            alert("item price cannot be negative");
+            return;
+        }
         this.props.addListing(this.state);
         this.setState({
             itemName: "",
@@ -33,53 +48,39 @@ export default class AddListing extends Component {
     }
     render() {
         return (
-            <div>
-                <Form
-                    name="basic"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    initialValues={{ remember: true }}
-                    autoComplete="off"
+            <div style = {{display: 'flex', flexDirection: 'column'}}>
+                <TextField 
+                    id="outlined-basic" 
+                    label="Item Name" 
+                    variant="outlined" 
+                    value={this.state.itemName}
+                    onChange={(newValue) => {this.setItemName(newValue.target.value)}}
+				/>
+                <TextField 
+                    id="outlined-basic" 
+                    label="Item Description" 
+                    style={{marginTop: '5%'}}
+                    variant="outlined" 
+                    value={this.state.itemDescription}
+                    onChange={(newValue) => {this.setItemDescription(newValue.target.value)}}
+				/>
+                <TextField 
+                    id="outlined-basic" 
+                    label="Price" 
+                    style={{marginTop: '5%'}}
+                    variant="outlined" 
+                    type="number"
+                    value={this.state.askingPrice}
+                    onChange={(newValue) => {this.setAskingPrice(newValue.target.value)}}
+				/>
+                <Button 
+                    color="primary" 
+                    onClick={() => this.submit()}
+                    style={{marginTop: '5%'}}
                 >
-                    <Form.Item
-                        label="Item Name"
-                        name="itemName"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
-                    >
-                        <Input 
-                            value={this.state.itemName}
-                            onChange={(newItemName) => this.setItemName(newItemName.target.value)}
-                        />
-                    </Form.Item>
-            
-                    <Form.Item
-                        label="Item Description"
-                        name="itemDescription"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
-                    >
-                        <Input 
-                            value={this.state.itemDescription}
-                            onChange={(newItemDescription) => this.setItemDescription(newItemDescription.target.value)}
-                        />
-                    </Form.Item>
+                    <b>SUBMIT</b>
+                </Button>
 
-                    <Form.Item
-                    label="Asking Price"
-                    name="askingPrice"
-                    rules={[{ required: true, message: 'Please input your password!' }]}
-                    >
-                        <InputNumber
-                            value={this.state.askingPrice}
-                            onChange={(newAskingPrice) => {this.setAskingPrice(newAskingPrice)}}
-                        />
-                    </Form.Item>
-            
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit" onClick={() => this.submit()}>
-                            Submit
-                        </Button>
-                    </Form.Item>
-                </Form>
             </div>
         )
     }

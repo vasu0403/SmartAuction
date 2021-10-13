@@ -7,7 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
-
+import auction from '../images/auction.png';
+import market from '../images/market3.png';
 
 export default class Forms extends Component {
     render() {
@@ -26,15 +27,22 @@ export default class Forms extends Component {
                             </Box>
                         </Toolbar>
                     </AppBar>
-                <div style = {{display: 'flex', justifyContent: 'space-evenly'}}>
-
-                    <div>
-                        <h2>Listing Form</h2>
-                        <AddListing addListing={this.props.addListing}/>
+                <div style = {{display: 'flex', justifyContent: 'center', alignContent: 'center'}}>
+                    <div >
+                        <div style = {{display: 'flex', justifyContent: 'space-around', alignContent: 'space-around'}}>
+                            <img src={market} style={{width: '50%'}}/>
+                        </div>
+                        <div style = {{display: 'flex', justifyContent: 'space-around', alignContent: 'space-around'}}>
+                            <AddListing addListing={this.props.addListing}/>
+                        </div>
                     </div>
-                    <div>
-                        <h2>Auction Form</h2>
-                        <AddAuction addAuction={this.props.addAuction}/>
+                    <div >
+                        <div style = {{display: 'flex', justifyContent: 'space-around', alignContent: 'space-around'}}>
+                            <img src={auction} style={{width: '50%'}}/>
+                        </div>
+                        <div style = {{display: 'flex', justifyContent: 'space-around', alignContent: 'space-around'}}>
+                            <AddAuction addAuction={this.props.addAuction}/>
+                        </div>
                     </div>
                 </div>
             </div>

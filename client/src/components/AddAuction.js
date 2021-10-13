@@ -1,12 +1,18 @@
 import React, { Component } from "react";
-import { Form, Input, Button, InputNumber} from 'antd';
+// import { Form, Input, Button, InputNumber} from 'antd';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 export default class AddAuction extends Component {
     state = {
         itemName: "",
         itemDescription: "",
         biddingTime: "",
         revealTime: "",
-        method: "",
+        method: "FirstPrice",
     }
     setItemName(newItemName) {
         this.setState({
@@ -20,23 +26,20 @@ export default class AddAuction extends Component {
             itemDescription: newItemDescription,
         })
     }
-    setBiddingTime(newBiddingTime) {
-        this.setState({
-            biddingTime: newBiddingTime,
-        })
-    }
-    setRevealTime(newRevealTime) {
-        this.setState({
-            revealTime: newRevealTime,
-        })
-    }
     setMethod(newMethod) {
         this.setState({
             method: newMethod,
         })
     }
     submit() {
-        console.log(this.state);
+        if(this.state.itemName == "") {
+            alert("item name cannot be empty");
+            return;
+        }
+        if(this.state.itemDescription == "") {
+            alert("item Description cannot be empty");
+            return;
+        }
         this.props.addAuction(this.state);
         this.setState({
             itemName: "",
@@ -55,51 +58,43 @@ export default class AddAuction extends Component {
             console.log('Failed:', errorInfo);
         };
         return (
-            <div>
-                <Form
-                    name="basic"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    initialValues={{ remember: true }}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                    <Form.Item
-                        label="Item Name"
-                        name="itemName"
-                    >
-                        <Input 
-                            value={this.state.itemName}
-                            onChange={(newItemName) => this.setItemName(newItemName.target.value)}
-                        />
-                    </Form.Item>
-            
-                    <Form.Item
-                        label="Item Description"
-                        name="itemDescription"
-                    >
-                        <Input 
-                            value={this.state.itemDescription}
-                            onChange={(newItemDescription) => this.setItemDescription(newItemDescription.target.value)}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
+            <div style = {{display: 'flex', flexDirection: 'column'}}>
+                <TextField 
+                    id="outlined-basic" 
+                    label="Item Name" 
+                    variant="outlined" 
+                    value={this.state.itemName}
+                    onChange={(newValue) => {this.setItemName(newValue.target.value)}}
+				/>
+                <TextField 
+                    id="outlined-basic" 
+                    label="Item Description" 
+                    style={{marginTop: '5%'}}
+                    variant="outlined" 
+                    value={this.state.itemDescription}
+                    onChange={(newValue) => {this.setItemDescription(newValue.target.value)}}
+				/>
+                <FormControl sx={{ m: 1, minWidth: 120}} style={{marginTop: '9%'}}>
+                    <InputLabel id="demo-simple-select-helper-label">Method</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-helper-label"
+                        id="demo-simple-select-helper"
+                        value={this.state.method}
                         label="Method"
-                        name="method"
+                        onChange={(newValue) => {this.setMethod(newValue.target.value)}}
                     >
-                        <Input 
-                            value={this.state.method}
-                            onChange={(newMethod) => this.setMethod(newMethod.target.value)}
-                        />
-                    </Form.Item>
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit" onClick={() => this.submit()}>
-                            Submit
-                        </Button>
-                    </Form.Item>
-                </Form>
+                        <MenuItem value="FirstPrice">First Price</MenuItem>
+                        <MenuItem value="SecondPricePrice">Second Price</MenuItem>
+                        <MenuItem value="AveragePrice">Average Price</MenuItem>
+                    </Select>
+                </FormControl>
+                <Button 
+                    color="primary" 
+                    onClick={() => this.submit()}
+                    style={{marginTop: '5%'}}
+                >
+                    <b>SUBMIT</b>
+                </Button>
             </div>
         )
     }
