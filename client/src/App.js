@@ -9,6 +9,12 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import Reveal from './components/Reveal';
 import Keys from './components/Keys';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
+
 
 class App extends Component {
 	state = { storageValue: 0, web3: null, accounts: null, contract: null };
@@ -205,6 +211,7 @@ class App extends Component {
 		if (!this.state.web3) {
 			return <div>Loading Web3, accounts, and contract...</div>;
 		}
+		const classes = this.props
 		return (
 			<Router>
 				<div>

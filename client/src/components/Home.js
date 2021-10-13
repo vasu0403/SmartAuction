@@ -48,6 +48,9 @@ class Home extends Component{
 								App Name
 							</Typography>
 							<div className="navbar">
+								<Link href="/forms" style={{"text-decoration": "none"}}>
+									<Button color="default" variant="contained">SELL</Button>
+								</Link>
 								<Link href="/reveal" style={{"text-decoration": "none"}}>
 									<Button color="default" variant="contained">Reveal Your Bid</Button>
 								</Link>
