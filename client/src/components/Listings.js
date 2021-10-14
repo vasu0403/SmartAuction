@@ -24,7 +24,7 @@ class Listings extends Component{
 
     render(){
         console.log("hello", this.state.listings)
-        let listingGrid = this.state.listings.map(listing => <Listing data={listing} buyListing={this.props.buyListing}/>);
+        let listingGrid = this.state.listings.map(listing => <Listing userId={this.props.userId} data={listing} buyListing={this.props.buyListing}/>);
         return(
             <Box margin="10px" display="flex" flexDirection="row" flexWrap="wrap" justifyContent="space-around" alignItems="center" width="90%">
                 {listingGrid}

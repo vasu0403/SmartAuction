@@ -2,8 +2,8 @@
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 import './FirstPriceAuction.sol';
-// import './SecondPriceAuction.sol';
-// import './AveragePriceAuction.sol';
+import './SecondPriceAuction.sol';
+import './AveragePriceAuction.sol';
 contract SmartStore {
     /// @author Heisenberg team
 
@@ -145,12 +145,12 @@ contract SmartStore {
         if(keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("FirstPrice"))) {
             return new FirstPriceAuction(creator);
         } 
-        // else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
-        //     return new SecondPriceAuction(creator); 
-        // } 
-        // else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
-        //     return new AveragePriceAuction(creator); 
-        // }
+        else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("SecondPrice"))) {
+            return new SecondPriceAuction(creator); 
+        } 
+        else if (keccak256(abi.encodePacked(method)) == keccak256(abi.encodePacked("AveragePrice"))) {
+            return new AveragePriceAuction(creator); 
+        }
     }
 
     /**
@@ -197,25 +197,25 @@ contract SmartStore {
     /**
      * @notice used for getting all the auctions
      */
-    function getAuctions() public view returns (Auction[] memory) {
-        uint available = 0;
-        for(uint i = 0; i < auctions.length; i++) {
-            uint itemID = auctions[i].auctionID;
-            if(auctionStatus[itemID] == AuctionState.RUNNING) {
-                available++;
-            }
-        }
+    // function getAuctions() public view returns (Auction[] memory) {
+    //     uint available = 0;
+    //     for(uint i = 0; i < auctions.length; i++) {
+    //         uint itemID = auctions[i].auctionID;
+    //         if(auctionStatus[itemID] == AuctionState.RUNNING) {
+    //             available++;
+    //         }
+    //     }
 
-        Auction[] memory activeAuctions = new Auction[](available);
-        uint index = 0;
-        for(uint i = 0; i < auctions.length; i++) {
-            uint itemID = auctions[i].auctionID;
-            if(auctionStatus[itemID] == AuctionState.RUNNING) {
-                activeAuctions[index++] = auctions[i];
-            }
-        }
-        return activeAuctions;
-    }
+    //     Auction[] memory activeAuctions = new Auction[](available);
+    //     uint index = 0;
+    //     for(uint i = 0; i < auctions.length; i++) {
+    //         uint itemID = auctions[i].auctionID;
+    //         if(auctionStatus[itemID] == AuctionState.RUNNING) {
+    //             activeAuctions[index++] = auctions[i];
+    //         }
+    //     }
+    //     return activeAuctions;
+    // }
 
     /**
      * @notice used for ending the bidding period of a particular auction
@@ -301,29 +301,31 @@ contract SmartStore {
         bytes32 hash = keccak256(abi.encodePacked(value, secret));
         return hash;
     }
+
+    
     /**
      * @notice used to get a list of all the products which are available for sale
      * @return the list of active products
      */
-    function getListings() public view returns (Listing[] memory) {
-        uint available = 0;
-        for(uint i = 0; i < listings.length; i++) {
-            uint itemID = listings[i].listingID;
-            if(status[itemID] == State.AVAILABLE) {
-                available++;
-            }
-        }
+    // function getListings() public view returns (Listing[] memory) {
+    //     uint available = 0;
+    //     for(uint i = 0; i < listings.length; i++) {
+    //         uint itemID = listings[i].listingID;
+    //         if(status[itemID] == State.AVAILABLE) {
+    //             available++;
+    //         }
+    //     }
 
-        Listing[] memory activeListings = new Listing[](available);
-        uint index = 0;
-        for(uint i = 0; i < listings.length; i++) {
-            uint itemID = listings[i].listingID;
-            if(status[itemID] == State.AVAILABLE) {
-                activeListings[index++] = listings[i];
-            }
-        }
-        return activeListings;
-    }
+    //     Listing[] memory activeListings = new Listing[](available);
+    //     uint index = 0;
+    //     for(uint i = 0; i < listings.length; i++) {
+    //         uint itemID = listings[i].listingID;
+    //         if(status[itemID] == State.AVAILABLE) {
+    //             activeListings[index++] = listings[i];
+    //         }
+    //     }
+    //     return activeListings;
+    // }
 
     /**
      * @notice buyers use this to buy a product which is available for sale

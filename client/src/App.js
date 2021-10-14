@@ -217,13 +217,13 @@ class App extends Component {
 				<div>
 					<Switch>
 						<Route exact path='/'>
-							<Home hasher={this.state.web3} getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
+							<Home userId={this.state.accounts[0]} hasher={this.state.web3} getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/reveal'>
 							<Reveal getAuctions={this.getAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/profile'>
-							<Profile endBiddingTime={this.endBiddingTime} endAuction={this.endAuction} getAuctions={this.getOwnerAuctions} getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
+							<Profile userId={this.state.accounts[0]} endBiddingTime={this.endBiddingTime} endAuction={this.endAuction} getAuctions={this.getOwnerAuctions} getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>
 						</Route>
 						<Route path='/forms'>
 							<Forms addListing={this.addListing} addAuction={this.addAuction}/>

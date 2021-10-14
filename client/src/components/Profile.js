@@ -47,7 +47,7 @@ class Profile extends Component{
 					<Toolbar>
 						<Box width="100%" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
 							<Typography variant="h6" className={classes.title}>
-								App Name
+								Smart Auction dApp
 							</Typography>
 							<Link href="/" style={{"text-decoration": "none"}}>
 								<Button color="default" variant="contained">Home</Button>
@@ -70,11 +70,10 @@ class Profile extends Component{
 				</Tabs>
 				{
 					this.state.tabValue === "0" ?
-						<BoughtItems getOrders={this.props.getOrders} /> :
+						<BoughtItems userId={this.props.userId} getOrders={this.props.getOrders} /> :
 						this.state.tabValue === "1" ?
 						<OwnerAuctions endBiddingTime={this.props.endBiddingTime} endAuction={this.props.endAuction} getAuctions={this.props.getAuctions}/> :
 						<PendingDeliveries getPendingDeliveries = {this.props.getPendingDeliveries} deliverListing = {this.props.deliverListing}/>
-					
 				}
 
 			</div>

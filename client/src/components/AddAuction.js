@@ -84,7 +84,7 @@ export default class AddAuction extends Component {
                         onChange={(newValue) => {this.setMethod(newValue.target.value)}}
                     >
                         <MenuItem value="FirstPrice">First Price</MenuItem>
-                        <MenuItem value="SecondPricePrice">Second Price</MenuItem>
+                        <MenuItem value="SecondPrice">Second Price</MenuItem>
                         <MenuItem value="AveragePrice">Average Price</MenuItem>
                     </Select>
                 </FormControl>

@@ -26,14 +26,22 @@ class Listing extends Component{
 		super(props);
 		this.state = {
 			ordering: false,
-			publicKey: "",
+			publicKey: null,
 		}
 	}
 	enterPublicKey(){
 		this.setState({ordering: !this.state.ordering});
 	}
-	submit(itemId, publicKey, price){
-		console.log(itemId, publicKey, price);
+
+	async submit(itemId, price){
+		let publicKey = window.localStorage.getItem(this.props.userId+"_pub");
+		if(!publicKey){
+			const EthCrypto = require('eth-crypto');
+			const identity = EthCrypto.createIdentity();
+			window.localStorage.setItem(this.props.userId+"_pub", identity.publicKey);
+			window.localStorage.setItem(this.props.userId+"_pri", identity.privateKey);
+			publicKey = identity.publicKey;
+		}
 		this.props.buyListing(itemId, publicKey, price);
 	}
 	changePublicKey(newValue) {
@@ -49,20 +57,9 @@ class Listing extends Component{
 					<div><h2>{this.props.data.itemName}</h2></div>
 					<div>{this.props.data.askingPrice} WEI</div>
 				</div>
-				<div style={{border: "solid 1px black"}}>{this.props.data.itemDescription}</div>
-				<div style={{marginTop: '2%'}}>
-					<TextField 
-						id="outlined-basic" 
-						label="Enter you public key here" 
-						variant="outlined" 
-						value={this.state.publicKey}
-						onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
-					/>
-				</div>
+				<div><p><pre>Item Description:</pre></p>{this.props.data.itemDescription}</div>
 				<div className='listing-footer'>
-					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
-					{/* {this.state.ordering ? */}
-					<Button color="primary" onClick={() => this.submit(this.props.data.listingID, this.state.publicKey, this.props.data.askingPrice)}><b>Buy</b></Button>
+					<Button color="primary" onClick={() => this.submit(this.props.data.listingID, this.props.data.askingPrice)}><b>Buy</b></Button>
 				</div>
 			</Card>
 		)

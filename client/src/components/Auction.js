@@ -27,10 +27,10 @@ class Auction extends Component{
 		super(props);
 		this.state = {
 			ordering: false,
-			publicKey: "",
-            bid: "",
-			bidKey: "",
-			hash: ""
+			publicKey: null,
+            bid: null,
+			bidKey: null,
+			hash: null
 		}
 	}
 
@@ -41,10 +41,6 @@ class Auction extends Component{
     }
 	enterPublicKey(){
 		this.setState({ordering: !this.state.ordering});
-	}
-	submit(itemId, publicKey, price){
-		console.log(itemId, publicKey, price);
-		this.props.buyListing(itemId, publicKey, price);
 	}
 	changePublicKey(newValue) {
 		this.setState({
@@ -59,16 +55,29 @@ class Auction extends Component{
 	}
 
     async placeBid(bidValue, publicKey, bidKey){
+		if(bidValue === null || publicKey === null || bidKey === null){
+			alert("Fill the values completely!!!")
+			return;
+		}
+		console.log(bidValue, publicKey, bidKey)
 		const hash = this.props.hasher.utils.soliditySha3(
 			{t: 'uint256', v: bidValue},
 			{t: 'bytes32', v: bidKey}
 		)
-		alert("Your hashed bid is: " + hash)
-		console.log("hell owold")
+		alert("Your hashed bid is: " + hash + "Store it!!")
         this.props.placeBid(this.props.data.auctionID, hash, publicKey);
+		this.setState({
+			bid: null,
+			publicKey: null,
+			bidKey: null
+		})
     }
 
 	async revealBid(bidValue, secret){
+		if(bidValue === null || secret === null){
+			alert("Fill the values completely!!!");
+			return;
+		}
 		this.props.revealBid(this.props.data.auctionID, bidValue, secret);
 	}
 
@@ -81,9 +90,11 @@ class Auction extends Component{
                     <Typography>{this.props.data.method}</Typography>
 					{/* <div>{this.props.data.askingPrice} WEI</div> */}
 				</div>
-				<div style={{border: "solid 1px black"}}>{this.props.data.itemDescription}</div>
+				<div>
+					<p><pre>Item Description:</pre></p>{this.props.data.itemDescription}</div>
 				{this.props.type != "owner" ?
-					<div className='auctionTextFields'>
+					<div className='auctionTextFields textFields'>
+						<div style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly"}}>
 						<TextField 
 							label="Bid Price" 
 							variant="standard"
@@ -96,16 +107,16 @@ class Auction extends Component{
 							variant="outlined" 
 							value={this.state.publicKey}
 							className="textField"
-							style={{width: "50%"}}
 							onChange={(newValue) => {this.changePublicKey(newValue.target.value)}}
 						/>
+						</div>
 						{this.props.type === "bidding" ?
 						<TextField 
 							label="Key to Hash Bid" 
 							variant="outlined" 
 							value={this.state.bidKey}
 							className="textField"
-							style={{width: "50%"}}
+							style={{width: "100%"}}
 							onChange={(newValue) => {this.changeBidKey(newValue.target.value)}}
 						/> : <div></div>}
 					</div> :

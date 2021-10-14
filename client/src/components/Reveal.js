@@ -50,7 +50,7 @@ class Reveal extends Component{
 					<Toolbar>
 						<Box width="100%" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
 							<Typography variant="h6" className={classes.title}>
-								App Name
+								Smart Auction dApp
 							</Typography>
                             <Link href="/" style={{"text-decoration": "none"}}>
                                 <Button color="default" variant="contained">Home</Button>

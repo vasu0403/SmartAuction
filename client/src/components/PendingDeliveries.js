@@ -3,7 +3,7 @@ import Listing from './Listing';
 import Box from '@material-ui/core/Box';
 import PendingDelivery from './PendingDelivery';
 
-class Listings extends Component{
+class PendingDeliveries extends Component{
     constructor(props){
         super(props)
         this.state = {
@@ -48,4 +48,4 @@ class Listings extends Component{
     }
 }
 
-export default Listings;
+export default PendingDeliveries;

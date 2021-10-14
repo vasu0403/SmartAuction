@@ -25,8 +25,24 @@ class BoughtItem extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
+			itemText: null
 		}
 	}
+	async decrypt(secretString){
+		const EthCrypto = require('eth-crypto');
+		let privateKey = await window.localStorage.getItem(this.props.userId+"_pri");
+		console.log(privateKey);
+		let decrypted = await EthCrypto.decryptWithPrivateKey(privateKey, JSON.parse(secretString));
+		console.log(decrypted, secretString);
+		this.setState({
+			itemText: decrypted
+		})
+	}
+
+	componentDidMount(){
+		this.decrypt(this.props.secret)
+	}
+
 	render(){
 		const classes = this.props
 		return(
@@ -34,8 +50,8 @@ class BoughtItem extends Component{
 				<div className='listing-header'>
 					<div><h2>{this.props.name}</h2></div>
 				</div>
-				<div style={{border: "solid 1px black"}}>{this.props.desc}</div>
-                <div>{this.props.text}</div>
+				<div style={{border: "solid 1px black"}}>s{this.props.desc}</div>
+                <div>{this.state.itemText}</div>
 			</Card>
 		)
 	}

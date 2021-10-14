@@ -24,7 +24,7 @@ class BoughtItems extends Component{
 
     render(){
         console.log("hello", this.state.items)
-        let itemGrid = this.state.items.map(item => <BoughtItem desc={item.itemDescription} name={item.itemName} listingId={item.listingID} text={item.itemText}/>);
+        let itemGrid = this.state.items.map(item => <BoughtItem userId={this.props.userId} desc={item.itemDescription} name={item.itemName} listingId={item.listingID} secret={item.itemText}/>);
         return(
             <Box margin="10px" display="flex" flexDirection="row" flexWrap="wrap" justifyContent="space-around" alignItems="center" width="90%">
                 {itemGrid}

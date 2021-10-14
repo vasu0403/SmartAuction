@@ -21,7 +21,7 @@ const styles = theme => ({
 	},
 });
 
-class Listing extends Component{
+class PendingDelivery extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
@@ -33,14 +33,27 @@ class Listing extends Component{
 	enterPublicKey(){
 		this.setState({ordering: !this.state.ordering});
 	}
-	submit(itemId, publicKey, price){
-		console.log(itemId, publicKey, price);
-		this.props.buyListing(itemId, publicKey, price);
-	}
 	changeItemText(newValue) {
 		this.setState({
 			itemText: newValue,
 		})
+	}
+	async encrypt(text) {
+        const key = this.props.publicKey;
+		console.log(key)
+        const EthCrypto = require('eth-crypto')
+        let encrypted = await EthCrypto.encryptWithPublicKey(key, text);
+        let encryptedText = JSON.stringify(encrypted)
+		console.log("encrypted text", encrypted.ciphertext, encryptedText);
+		return encryptedText;
+    }
+	async submit(listingId, itemText){
+		if(itemText === null){
+			alert("Provide the secret item string first");
+			return;
+		}
+		let secretString = await this.encrypt(itemText);
+		this.props.deliverListing(listingId, secretString);
 	}
 	render(){
 		const classes = this.props
@@ -51,7 +64,7 @@ class Listing extends Component{
 					<div>{this.props.price} WEI</div>
 				</div>
 				<div style={{border: "solid 1px black"}}>{this.props.desc}</div>
-				<div style={{border: "solid 1px black", marginTop: '2%'}}>{this.props.publicKey}</div>
+				{/* <div style={{border: "solid 1px black", marginTop: '2%'}}>{this.props.publicKey}</div> */}
 				<TextField 
 						id="outlined-basic" 
 						label="Enter item string here" 
@@ -62,11 +75,11 @@ class Listing extends Component{
 				<div className='listing-footer'>
 					{/* <Button color="primary" onClick={() => this.enterPublicKey}><b>{this.state.ordering ? Cancel : Order}</b></Button> */}
 					{/* {this.state.ordering ? */}
-					<Button color="primary" onClick={() => this.props.deliverListing(this.props.listingId, this.state.itemText)}><b>Deliver</b></Button>
+					<Button color="primary" onClick={() => this.submit(this.props.listingId, this.state.itemText)}><b>Deliver</b></Button>
 				</div>
 			</Card>
 		)
 	}
 }
 
-export default withStyles(styles)(Listing);
+export default withStyles(styles)(PendingDelivery);

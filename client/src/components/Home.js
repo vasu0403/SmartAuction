@@ -45,7 +45,7 @@ class Home extends Component{
 					<Toolbar>
 						<Box width="100%" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
 							<Typography variant="h6" className={classes.title}>
-								App Name
+								Smart Auction dApp
 							</Typography>
 							<div className="navbar">
 								<Link href="/forms" style={{"text-decoration": "none"}}>
@@ -75,8 +75,8 @@ class Home extends Component{
 				</Tabs>
 				<Box display="flex" alignItems="center" justifyContent="center">
 					{this.state.tabValue === "0" ?
-					<Listings getListings={this.props.getListings} buyListing={this.props.buyListing}/> :
-					<Auctions hasher={this.props.hasher} auctionStatus={1} getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>}
+					<Listings userId={this.props.userId} getListings={this.props.getListings} buyListing={this.props.buyListing}/> :
+					<Auctions userId={this.props.userId} hasher={this.props.hasher} auctionStatus={1} getAuctions={this.props.getAuctions} getBidHash={this.props.getBidHash} placeBid={this.props.placeBid} revealBid={this.props.revealBid}/>}
 				</Box>
 			</div>
 		)
