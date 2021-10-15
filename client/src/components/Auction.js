@@ -37,7 +37,7 @@ class Auction extends Component{
 		super(props);
 		this.state = {
 			ordering: false,
-            bid: null,
+            bid: 0,
 			bidKey: null
 		}
 	}
@@ -61,6 +61,10 @@ class Auction extends Component{
     async placeBid(bidValue, bidKey){
 		if(bidValue === null || bidKey === null){
 			alert("Fill the values completely!!!")
+			return;
+		}
+		if(bidValue < 0) {
+			alert("Bid value must be positive!!!");
 			return;
 		}
 		let publicKey = window.localStorage.getItem(this.props.userId+"_pub");
@@ -89,6 +93,10 @@ class Auction extends Component{
 	async revealBid(bidValue){
 		if(bidValue === null){
 			alert("Fill the values completely!!!");
+			return;
+		}
+		if(bidValue < 0) {
+			alert("Bid value must be positive!!!");
 			return;
 		}
 		let bidKey = await window.localStorage.getItem(this.props.userId+"_bidKey");
