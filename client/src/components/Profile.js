@@ -1,3 +1,6 @@
+/**
+ * renders your profile (products that you own, auctions that you started, and item which you put up for sale in the market)
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';

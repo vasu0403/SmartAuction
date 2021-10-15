@@ -1,3 +1,6 @@
+/**
+ * Renders an available auction
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -39,6 +42,10 @@ class Auction extends Component{
 		}
 	}
 
+	/**
+	 * updates the value of bid
+	 * @param newValue updated bid value
+	 */
     changeBid(newValue){
         this.setState({
             bid: newValue
@@ -52,7 +59,7 @@ class Auction extends Component{
 	}
 
     async placeBid(bidValue, bidKey){
-		if(bidValue === null){
+		if(bidValue === null || bidKey === null){
 			alert("Fill the values completely!!!")
 			return;
 		}

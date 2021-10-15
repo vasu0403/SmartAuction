@@ -1,3 +1,6 @@
+/**
+ * Renders all the available products for sale
+ */
 import React, {Component} from 'react';
 import Listing from './Listing';
 import Box from '@material-ui/core/Box';
@@ -10,6 +13,9 @@ class Listings extends Component{
         }
     }
     
+    /**
+     * Gets all the available products for sale
+     */
     async getListings(){
         var listings = await this.props.getListings();
         return listings;

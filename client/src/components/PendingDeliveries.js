@@ -1,3 +1,7 @@
+/**
+ * renders all the items that you are selling for which a buyer has been finalised (either throug normal market or through auction)
+ * but the product is yet to be deliverd
+ */
 import React, {Component} from 'react';
 import Listing from './Listing';
 import Box from '@material-ui/core/Box';
@@ -12,6 +16,9 @@ class PendingDeliveries extends Component{
         this.deliverAndUpdateListing = this.deliverAndUpdateListing.bind(this);
     }
     
+    /**
+     * gets your pending deliveries
+     */
     async getPendingDeliveries(){
         console.log('here also')
         const pendingDeliveries = await this.props.getPendingDeliveries();
@@ -23,6 +30,11 @@ class PendingDeliveries extends Component{
             pendingDeliveries: result
         }, () => console.log(this.state, 'these are your pending deliveries')));
     }
+    /**
+     * deliver item
+     * @param  itemID id of item that is to be delivered
+     * @param  itemText text (encrypted) representing the delivered item
+     */
     deliverAndUpdateListing(itemID, itemText) {
         this.props.deliverListing(itemID, itemText);
         this.getPendingDeliveries().then(result => this.setState({

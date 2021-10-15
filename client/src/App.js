@@ -47,6 +47,10 @@ class App extends Component {
 		}
 	};
 
+	/**
+	 * @notice used to make a backend call for adding a new listing to the market
+	 * @param formValues input describing the new listing  
+	 */
 	addListing = async (formValues) => {
 		const { accounts, contract } = this.state;
 		console.log('in App.js', formValues);
@@ -60,23 +64,42 @@ class App extends Component {
 		// this.setState({ storageValue: response });
 	};
 
+	
+	/**
+	 * @notice used to make a backend call for starting a new auction
+	 * @param formValues input describing the new auction
+	 */
 	addAuction = async (formValues) => {
 		const {accounts, contract} = this.state;
 
 		await contract.methods.addAuction(formValues.itemName, formValues.itemDescription, formValues.method).send({from: accounts[0]});
 	}
 
+	/**
+	 * @notice used to make a backend call for placing an order for an existing listing
+	 * @param itemId the id of the listing for which an order is to be placed
+	 * @param key the key with which seller should encrypt the product before sending
+	 * @param price asking price of the item to be purchased
+	 */
 	buyListing = async (itemId, key, price) => {
 		const {accounts, contract} = this.state;
 		console.log(accounts);
 		await contract.methods.buyListing(itemId, key).send({from: accounts[0], value: price});
 	}
 
+	/**
+	 * @notice used to make a backend call for delivering an ordered listing
+	 * @param itemId the id of the listing for which is to be delivered
+	 * @param text represents the product
+	 */
 	deliverListing = async (itemId, text) => {
 		const {accounts, contract} = this.state;
 		await contract.methods.delieverItem(itemId, text).send({from: accounts[0]});
 	}
 
+	/**
+	 * @notice used to make a backend call for getting all the active listings
+	 */
 	getListings = async() => {
 		const {accounts, contract} = this.state;
 		console.log("getting listings");
@@ -98,6 +121,9 @@ class App extends Component {
 		return listings;
 	}
 
+	/**
+	 * @notice used to make a backend call for getting all the ongoing auctions
+	 */
 	getAuctions = async(status) => {
 		const {accounts, contract} = this.state;
 		console.log("getting auctions");
@@ -121,6 +147,9 @@ class App extends Component {
 		return auctions;
 	}
 
+	/**
+	 * @notice used to make a backend call for getting all the auctions of a particular owner
+	 */
 	getOwnerAuctions = async() => {
 		const {accounts, contract} = this.state;
 		console.log("getting your auctions");
@@ -142,16 +171,29 @@ class App extends Component {
 		return auctions;
 	}
 
+	/**
+	 * @notice used to make a backend call for ending the bidding time of particular auction
+	 * @param auctionId id of the auction for which bidding time is to be stopped
+	 */
 	endBiddingTime = async(auctionId) => {
 		const {accounts, contract} = this.state;
 		await contract.methods.endBiddingTime(auctionId).send({from: accounts[0]});
 	}
 
+	/**
+	 * @notice used to make a backend call for ending a particular auction
+	 * @param aucionId id of the auction which is to be stopped
+	 */
 	endAuction = async(auctionId) => {
 		const {accounts, contract} = this.state;
 		await contract.methods.endAuction(auctionId).send({from: accounts[0]});
 	}
 
+	/**
+	 * @notice used for hashing the bid price with a secret key
+	 * @param bidValue an integer value representing the actual bid price
+	 * @param secret key with which the bid is to be hashed
+	 */
 	getBidHash = async(bidValue, secret) => {
 		const {accounts, contract} = this.state;
 
@@ -159,6 +201,12 @@ class App extends Component {
 		return hash;
 	}
 
+	/**
+	 * @notice used for placing the bid on a particular auction
+	 * @param auctionId if of the auction on which bid is to be placed
+	 * @param _blindedBid the bid value (encrypted)
+	 * @param publicKey key with which seller should encrypt the product before delivering
+	 */
 	placeBid = async(auctionId, _blindedBid, publicKey) => {
 		const {accounts, contract} = this.state;
 		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).send({from: accounts[0]});
@@ -169,6 +217,9 @@ class App extends Component {
 		await contract.methods.revealBid(auctionId, bidValue, bidKey).send({from: accounts[0], value: bidValue});
 	}
 
+	/**
+	 * @notice get all the order that are yet to be delivered by a particular seller
+	 */
 	getPendingDeliveries = async() => {
 		const {accounts, contract} = this.state;
 		console.log("getting pending deliveries");
@@ -188,6 +239,9 @@ class App extends Component {
 		return pendingDeliveries;
 	}
 
+	/**
+	 * @notice get all yoour orders that have been delivered
+	 */
 	getOrders = async() => {
 		const {accounts, contract} = this.state;
 		console.log("getting your orders");

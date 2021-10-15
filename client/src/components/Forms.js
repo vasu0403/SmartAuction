@@ -1,3 +1,6 @@
+/**
+ * renders forms to add a new product to market and also for starting a new auction
+ */
 import React, { Component } from "react";
 import AddListing from './AddListing';
 import AddAuction from './AddAuction';

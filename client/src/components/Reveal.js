@@ -1,3 +1,6 @@
+/**
+ * renders the tab to reveal your bid an an auction
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -31,6 +34,10 @@ class Reveal extends Component{
         this.state = {}
     }
 
+    /**
+     * gets all the auctions in which you have participated
+     * @returns auctions
+     */
     async getAuctions(){
         var auctions = await this.props.getAuctions();
         return auctions;
