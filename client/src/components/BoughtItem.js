@@ -1,3 +1,6 @@
+/**
+ * Renders an item which you have purchased and has been delivered
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -28,6 +31,10 @@ class BoughtItem extends Component{
 			itemText: null
 		}
 	}
+	/**
+	 * Decrypts the encrypted text which the seller must have given while delivering the product
+	 * @param secretString the encrypted text
+	 */
 	async decrypt(secretString){
 		const EthCrypto = require('eth-crypto');
 		let privateKey = await window.localStorage.getItem(this.props.userId+"_pri");

@@ -1,3 +1,6 @@
+/**
+ * Renders all the items which you have purchased and have been delivered
+ */
 import React, {Component} from 'react';
 import BoughtItem from './BoughtItem';
 import Box from '@material-ui/core/Box';
@@ -10,6 +13,10 @@ class BoughtItems extends Component{
         }
     }
     
+    /**
+     * used for getting all your purchased items that have been delivered
+     * @returns items
+     */
     async getOrders(){
         var items = await this.props.getOrders();
         return items;

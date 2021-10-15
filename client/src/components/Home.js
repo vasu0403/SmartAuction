@@ -1,3 +1,6 @@
+/**
+ * Renders the home page which includes all the avaiable items for purchase and all the ongoing auctions
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';

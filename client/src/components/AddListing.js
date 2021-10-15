@@ -1,3 +1,6 @@
+/**
+ * Renders the form to add a new product to the market
+ */
 import React, { Component } from "react";
 // import { Form, Input, Button, InputNumber} from 'antd';
 import TextField from '@material-ui/core/TextField';
@@ -9,6 +12,10 @@ export default class AddListing extends Component {
         itemDescription: "",
         askingPrice: 0,
     }
+    /**
+     * changes the item name with the value provided in the input
+     * @param newItemName the new item name
+     */
     setItemName(newItemName) {
         this.setState({
             itemName: newItemName,
@@ -16,16 +23,27 @@ export default class AddListing extends Component {
             console.log(this.state)
         })
     }
+    /**
+     * changes the item descriptiong with the value provided in the input
+     * @param newItemDescription the new item description
+     */
     setItemDescription(newItemDescription) {
         this.setState({
             itemDescription: newItemDescription,
         })
     }
+    /**
+     * changes the item price with the value provided in the input
+     * @param newAskingprice the new item price
+     */
     setAskingPrice(newAskingPrice) {
         this.setState({
             askingPrice: newAskingPrice,
         })
     }
+    /**
+     * add a new product to the market (values must be filled in the form)
+     */
     submit() {
         if(this.state.itemName == "") {
             alert("item name cannot be empty");

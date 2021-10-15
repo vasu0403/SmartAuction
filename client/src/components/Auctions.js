@@ -1,3 +1,6 @@
+/**
+ * Renders all the auctions
+ */
 import React, {Component} from 'react';
 import Auction from './Auction';
 import Box from '@material-ui/core/Box';
@@ -10,6 +13,10 @@ class Auctions extends Component{
         }
     }
 
+    /**
+     *  used for getting all the auctions
+     * @returns all the auctions
+     */
     async getAuctions(){
         var auctions = await this.props.getAuctions(this.props.auctionStatus);
         return auctions;

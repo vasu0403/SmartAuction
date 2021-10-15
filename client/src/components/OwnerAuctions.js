@@ -1,3 +1,6 @@
+/**
+ * Renders all the auctions that you own
+ */
 import React, {Component} from 'react';
 import OwnerAuction from './OwnerAuction';
 import Box from '@material-ui/core/Box';
@@ -10,6 +13,9 @@ class OwnerAuctions extends Component{
         }
     }
 
+    /**
+     * gets all the auctions that you own
+     */
     async getAuctions(){
         var auctions = await this.props.getAuctions();
         return auctions;

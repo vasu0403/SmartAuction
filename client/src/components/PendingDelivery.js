@@ -1,3 +1,7 @@
+/**
+ * renders an item that you are selling for which a buyer has been finalised (either throug normal market or through auction)
+ * but the product is yet to be deliverd
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -33,11 +37,18 @@ class PendingDelivery extends Component{
 	enterPublicKey(){
 		this.setState({ordering: !this.state.ordering});
 	}
+	/**
+	 * updated the text representing the product
+	 */
 	changeItemText(newValue) {
 		this.setState({
 			itemText: newValue,
 		})
 	}
+	/**
+	 * encrypts the text that represents the product
+	 * @param text plain text representing the product
+	 */
 	async encrypt(text) {
         const key = this.props.publicKey;
 		console.log(key)
@@ -47,6 +58,11 @@ class PendingDelivery extends Component{
 		console.log("encrypted text", encrypted.ciphertext, encryptedText);
 		return encryptedText;
     }
+	/**
+	 * deliver item
+	 * @param listingId id of product that is to be delivered
+	 * @param itemText plain text representing the product
+	 */
 	async submit(listingId, itemText){
 		if(itemText === null){
 			alert("Provide the secret item string first");

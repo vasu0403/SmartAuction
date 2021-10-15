@@ -1,3 +1,6 @@
+/**
+ * Renders an auction that you own.
+ */
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -35,12 +38,17 @@ class OwnerAuction extends Component{
             status: this.props.data.status
         })
     }
-
+	/**
+	 * Ends the bidding for the auction
+	 */
     endBiddingTime(){
         console.log("bidding end");
         this.props.endBiddingTime(this.props.data.auctionID);
     }
     
+	/**
+	 * Ends the auction
+	 */
     endAuction(){
         console.log("auction ended");
         this.props.endAuction(this.props.data.auctionID);

@@ -1,3 +1,6 @@
+/**
+ * Renders the form for adding a new auction
+ */
 import React, { Component } from "react";
 // import { Form, Input, Button, InputNumber} from 'antd';
 import TextField from '@material-ui/core/TextField';
@@ -14,6 +17,10 @@ export default class AddAuction extends Component {
         revealTime: "",
         method: "FirstPrice",
     }
+    /**
+     * updates item name
+     * @param newItemName 
+     */
     setItemName(newItemName) {
         this.setState({
             itemName: newItemName,
@@ -21,16 +28,29 @@ export default class AddAuction extends Component {
             console.log(this.state)
         })
     }
+    
+    /**
+     * updates item description
+     * @param newItemDescription 
+     */
     setItemDescription(newItemDescription) {
         this.setState({
             itemDescription: newItemDescription,
         })
     }
+    
+    /**
+     * updates the auction method
+     * @param newMethod 
+     */
     setMethod(newMethod) {
         this.setState({
             method: newMethod,
         })
     }
+    /**
+     * Called after clicking the submit button. Adds a new auction
+     */
     submit() {
         if(this.state.itemName == "") {
             alert("item name cannot be empty");
