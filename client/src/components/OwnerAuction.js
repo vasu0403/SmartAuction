@@ -55,7 +55,7 @@ class OwnerAuction extends Component{
                     <Typography>{this.props.data.method}</Typography>
 					{/* <div>{this.props.data.askingPrice} WEI</div> */}
 				</div>
-				<div style={{border: "solid 1px black"}}>{this.props.data.itemDescription}</div>
+				<p><pre>Item Description:</pre></p>{this.props.data.itemDescription}
 				<div className='listing-footer'>
                     <Button color="primary" onClick={() => this.endBiddingTime()} disabled={this.props.data.status != 1}>End Bidding Time</Button>
                     <Button color="primary" onClick={() => this.endAuction()} disabled={this.props.data.status != 2}>End Auction</Button>

@@ -25,8 +25,7 @@ class Listing extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			ordering: false,
-			publicKey: null,
+			ordering: false
 		}
 	}
 	enterPublicKey(){
@@ -43,11 +42,6 @@ class Listing extends Component{
 			publicKey = identity.publicKey;
 		}
 		this.props.buyListing(itemId, publicKey, price);
-	}
-	changePublicKey(newValue) {
-		this.setState({
-			publicKey: newValue,
-		})
 	}
 	render(){
 		const classes = this.props

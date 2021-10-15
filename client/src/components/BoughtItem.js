@@ -50,8 +50,8 @@ class BoughtItem extends Component{
 				<div className='listing-header'>
 					<div><h2>{this.props.name}</h2></div>
 				</div>
-				<div style={{border: "solid 1px black"}}>s{this.props.desc}</div>
-                <div>{this.state.itemText}</div>
+				<div><p><pre>Item Description:</pre></p>{this.props.desc}</div>
+				<div><p><pre>Item String:</pre></p>{this.state.itemText}</div>
 			</Card>
 		)
 	}

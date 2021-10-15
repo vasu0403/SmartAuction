@@ -164,9 +164,9 @@ class App extends Component {
 		await contract.methods.placeBid(auctionId, _blindedBid, publicKey).send({from: accounts[0]});
 	}
 
-	revealBid = async(auctionId, bidValue, publicKey) => {
+	revealBid = async(auctionId, bidValue, bidKey) => {
 		const {accounts, contract} = this.state;
-		await contract.methods.revealBid(auctionId, bidValue, publicKey).send({from: accounts[0], value: bidValue});
+		await contract.methods.revealBid(auctionId, bidValue, bidKey).send({from: accounts[0], value: bidValue});
 	}
 
 	getPendingDeliveries = async() => {
@@ -220,7 +220,7 @@ class App extends Component {
 							<Home userId={this.state.accounts[0]} hasher={this.state.web3} getListings={this.getListings} buyListing={this.buyListing} getAuctions={this.getAuctions} getBidHash={this.getBidHash} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/reveal'>
-							<Reveal getAuctions={this.getAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
+							<Reveal userId={this.state.accounts[0]} hasher={this.state.web3} getAuctions={this.getAuctions} placeBid={this.placeBid} revealBid={this.revealBid}/>
 						</Route>
 						<Route path='/profile'>
 							<Profile userId={this.state.accounts[0]} endBiddingTime={this.endBiddingTime} endAuction={this.endAuction} getAuctions={this.getOwnerAuctions} getPendingDeliveries={this.getPendingDeliveries} deliverListing = {this.deliverListing} getOrders={this.getOrders}/>

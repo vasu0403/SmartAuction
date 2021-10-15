@@ -63,13 +63,13 @@ class PendingDelivery extends Component{
 					<div><h2>{this.props.name}</h2></div>
 					<div>{this.props.price} WEI</div>
 				</div>
-				<div style={{border: "solid 1px black"}}>{this.props.desc}</div>
-				{/* <div style={{border: "solid 1px black", marginTop: '2%'}}>{this.props.publicKey}</div> */}
+				<div><p><pre>Item Description:</pre></p>{this.props.desc}</div>
 				<TextField 
 						id="outlined-basic" 
 						label="Enter item string here" 
 						variant="outlined" 
 						value={this.state.itemText}
+						// className="textField"
 						onChange={(newValue) => {this.changeItemText(newValue.target.value)}}
 				/>
 				<div className='listing-footer'>
